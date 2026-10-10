@@ -48,7 +48,7 @@ export const Header: React.FC<HeaderProps> = ({ isMock, totalDurationMs }) => {
       </div>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-        {totalDurationMs !== undefined && totalDurationMs > 0 && (
+        {!isMock && totalDurationMs !== undefined && totalDurationMs > 0 && (
           <span
             style={{
               fontSize: '11px',

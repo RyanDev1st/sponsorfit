@@ -3,6 +3,8 @@ import React, { useState } from 'react';
 interface InputPanelProps {
   onRunAudit: (params: { creatorName: string; audienceSize: string; seedQueries: string[] }) => void;
   isLoading: boolean;
+  isCollapsed?: boolean;
+  onToggleCollapse?: () => void;
 }
 
 const PRESETS = [
@@ -26,7 +28,12 @@ const PRESETS = [
   },
 ];
 
-export const InputPanel: React.FC<InputPanelProps> = ({ onRunAudit, isLoading }) => {
+export const InputPanel: React.FC<InputPanelProps> = ({
+  onRunAudit,
+  isLoading,
+  isCollapsed = false,
+  onToggleCollapse,
+}) => {
   const [creatorName, setCreatorName] = useState('The Slow Drift');
   const [audienceSize, setAudienceSize] = useState('35,000 monthly listeners');
   const [seeds, setSeeds] = useState<string[]>(['A24', 'Phoebe Bridgers', 'Severance', 'Tartine Bakery']);
@@ -50,10 +57,100 @@ export const InputPanel: React.FC<InputPanelProps> = ({ onRunAudit, isLoading })
     setSeeds(seeds.filter((s) => s !== seedToRemove));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     onRunAudit({ creatorName, audienceSize, seedQueries: seeds });
   };
+
+  if (isCollapsed) {
+    return (
+      <section
+        id="input-summary-bar"
+        style={{
+          backgroundColor: '#FFFFFF',
+          border: '1px solid var(--border-light)',
+          borderRadius: 'var(--radius-md)',
+          padding: '12px 20px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          boxShadow: 'var(--shadow-subtle)',
+          flexWrap: 'wrap',
+          gap: '12px',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
+          <div>
+            <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-muted)', marginRight: '6px' }}>
+              Audience:
+            </span>
+            <strong style={{ fontSize: '13px', color: 'var(--text-main)' }}>{creatorName}</strong>
+            <span style={{ fontSize: '12px', color: 'var(--text-muted)', marginLeft: '6px' }}>({audienceSize})</span>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+            <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-muted)' }}>
+              Seeds:
+            </span>
+            {seeds.map((s) => (
+              <span
+                key={s}
+                style={{
+                  fontSize: '11px',
+                  backgroundColor: 'var(--bg-secondary)',
+                  border: '1px solid var(--border-light)',
+                  padding: '2px 8px',
+                  borderRadius: '12px',
+                  color: 'var(--text-main)',
+                  fontWeight: 500,
+                }}
+              >
+                ✦ {s}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <button
+            type="button"
+            id="edit-profile-button"
+            onClick={onToggleCollapse}
+            style={{
+              padding: '6px 12px',
+              fontSize: '12px',
+              fontWeight: 600,
+              backgroundColor: '#FFFFFF',
+              border: '1px solid var(--border-light)',
+              borderRadius: 'var(--radius-sm)',
+              cursor: 'pointer',
+              color: 'var(--text-main)',
+            }}
+          >
+            ✏️ Edit Profile & Seeds
+          </button>
+          <button
+            type="button"
+            id="re-run-audit-button"
+            onClick={() => handleSubmit()}
+            disabled={isLoading}
+            style={{
+              padding: '6px 14px',
+              fontSize: '12px',
+              fontWeight: 700,
+              backgroundColor: 'var(--accent-terracotta)',
+              color: '#FFFFFF',
+              border: 'none',
+              borderRadius: 'var(--radius-sm)',
+              cursor: isLoading ? 'not-allowed' : 'pointer',
+            }}
+          >
+            {isLoading ? 'Running...' : '↻ Re-run Audit'}
+          </button>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section
@@ -252,7 +349,7 @@ export const InputPanel: React.FC<InputPanelProps> = ({ onRunAudit, isLoading })
             transition: 'background-color 0.15s ease',
           }}
         >
-          {isLoading ? 'Running Autonomous Taste Audit...' : 'Run Cultural Sponsorship Audit →'}
+          {isLoading ? 'Running Taste Audit...' : 'Run Cultural Sponsorship Audit →'}
         </button>
       </form>
     </section>

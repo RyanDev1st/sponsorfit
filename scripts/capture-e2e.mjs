@@ -163,12 +163,7 @@ async function run() {
     await pageCdp.send('Page.navigate', { url: TARGET_URL });
     await sleep(2000);
 
-    // SCREENSHOT 1: Input view (01-input.png)
-    console.log('Capturing Screenshot 1: 01-input.png...');
-    await pageCdp.screenshot(join(screenshotsDir, '01-input.png'));
-    console.log('Saved 01-input.png');
-
-    // Wait for auto-audit to complete or click audit button
+    // Wait for auto-audit to complete
     console.log('Waiting for audit execution to complete...');
     let ready = false;
     for (let i = 0; i < 30; i++) {
@@ -182,20 +177,33 @@ async function run() {
     if (!ready) {
       throw new Error('Audit did not finish within timeout');
     }
+    await sleep(600);
+
+    // SCREENSHOT 1: Input view (expanded form)
+    console.log('Expanding input form for Screenshot 1: 01-input.png...');
+    await pageCdp.evaluate(`document.getElementById('edit-profile-button')?.click()`);
+    await sleep(600);
+    console.log('Capturing Screenshot 1: 01-input.png...');
+    await pageCdp.screenshot(join(screenshotsDir, '01-input.png'));
+    console.log('Saved 01-input.png');
+
+    // Run audit again to collapse input bar
+    console.log('Running audit to collapse into compact bar...');
+    await pageCdp.evaluate(`document.getElementById('run-audit-button')?.click()`);
     await sleep(1000);
 
     // SCREENSHOT 2: Agent trace view (02-agent-trace.png)
     console.log('Switching to Agent Trace view...');
     await pageCdp.evaluate(`document.getElementById('tab-trace-btn')?.click()`);
-    await sleep(800);
+    await sleep(600);
     console.log('Capturing Screenshot 2: 02-agent-trace.png...');
     await pageCdp.screenshot(join(screenshotsDir, '02-agent-trace.png'));
     console.log('Saved 02-agent-trace.png');
 
-    // SCREENSHOT 3: Results view (03-results.png)
-    console.log('Switching to Media Kit & Pitches view...');
-    await pageCdp.evaluate(`document.getElementById('tab-mediakit-btn')?.click()`);
-    await sleep(800);
+    // SCREENSHOT 3: Ranked Sponsors & Fit view (03-results.png)
+    console.log('Switching to Ranked Sponsors view...');
+    await pageCdp.evaluate(`document.getElementById('tab-sponsors-btn')?.click()`);
+    await sleep(600);
     console.log('Capturing Screenshot 3: 03-results.png...');
     await pageCdp.screenshot(join(screenshotsDir, '03-results.png'));
     console.log('Saved 03-results.png');

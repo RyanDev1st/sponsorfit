@@ -30,10 +30,10 @@ export const SponsorList: React.FC<SponsorListProps> = ({ sponsors, onSelectSpon
               color: 'var(--text-main)',
             }}
           >
-            2. Empirical Taste-Graph Sponsor Rankings
+            2. Ranked Sponsor Fit Tiers
           </h2>
           <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '2px' }}>
-            Candidate brands ranked by Qloo affinity score. Every statistic cites the exact response field.
+            Candidate brands ranked by Qloo affinity score. Every number links to the Qloo response field it came from.
           </p>
         </div>
         <span
@@ -155,16 +155,16 @@ export const SponsorList: React.FC<SponsorListProps> = ({ sponsors, onSelectSpon
                   />
                 </div>
 
-                {/* Cultural Rationale */}
-                <div style={{ fontSize: '12px', color: '#334155', marginBottom: '10px' }}>
+                {/* Plain Fit Explanation */}
+                <div style={{ fontSize: '12.5px', color: '#1E293B', lineHeight: 1.45, marginBottom: '8px' }}>
                   {brand.topDriver ? (
-                    <div>
-                      <strong>Key Cultural Driver:</strong> Fans of{' '}
-                      <em>{brand.topDriver.entity_name || brand.topDriver.entity_id}</em> influence affinity by{' '}
-                      <strong>{Number((brand.topDriver.influence * 100).toFixed(1))}%</strong>.
-                    </div>
+                    <span>
+                      Driven by audience interest in <strong>{brand.topDriver.entity_name || brand.topDriver.entity_id}</strong> ({Number((brand.topDriver.influence * 100).toFixed(0))}% signal pull).
+                    </span>
                   ) : (
-                    <div>Strong multi-signal behavioral overlap across cultural cluster.</div>
+                    <span>
+                      {brand.affinityPercent}% affinity across the combined cultural seed profile.
+                    </span>
                   )}
                 </div>
 

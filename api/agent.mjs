@@ -219,7 +219,7 @@ export class SponsorFitAgent {
     // Deterministic template synthesis (guarantees mathematical grounding)
     const mediaKit = {
       title: `${creatorName} — Cultural Media Kit`,
-      subtitle: `Empirical Taste-Graph Audience Audit (Powered by Qloo AI)`,
+      subtitle: `Taste-Graph Audience Audit (Powered by Qloo AI)`,
       audienceReach: audienceSize,
       isMock,
       seedSignals: resolvedEntities.map((e) => ({
@@ -258,14 +258,14 @@ export class SponsorFitAgent {
         `Dear ${sponsor.name} Partnerships Team,\n\n` +
         `I am writing from ${creatorName} (${audienceSize}). While standard creator pitches rely on vanity impressions, ` +
         `we recently audited our audience through Qloo's cultural taste graph.\n\n` +
-        `The data reveals an empirical behavioral alignment with ${sponsor.name}:\n` +
+        `The data reveals a direct behavioral alignment with ${sponsor.name}:\n` +
         `• Taste Affinity Score: ${sponsor.affinityPercent}% [field: ${sponsor.trace.affinityField} = ${sponsor.affinity}]\n` +
         `• Relative Fit Index: ${sponsor.multiplierVsBaseline}x vs sample mean (${baselinePercentStr}%) [derived: affinity / mean(sample)]\n` +
         `• Primary Driver: Listeners drawn to ${topSignalName} demonstrate a ${influenceVal}% affinity pull toward ${sponsor.name} ` +
         (sponsor.trace.topSignalField ? `[field: ${sponsor.trace.topSignalField} = ${sponsor.trace.topSignalInfluence}]\n` : '\n') +
         `• Shared Audience Tags: ${sponsor.tags.join(', ')} [field: ${sponsor.trace.tagsField}]\n\n` +
         `Unlike generic ad reads, a partnership between ${creatorName} and ${sponsor.name} delivers authentic cultural resonance ` +
-        `backed by empirical consumer preference data.\n\n` +
+        `backed by consumer preference data.\n\n` +
         `We would love to discuss a seasonal integrated sponsorship.\n\n` +
         `Best regards,\n` +
         `${creatorName} Partnerships`;

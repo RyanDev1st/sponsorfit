@@ -14,6 +14,7 @@ export const App: React.FC = () => {
   const [selectedBrandPitch, setSelectedBrandPitch] = useState<string>('');
   const [errorMsg, setErrorMsg] = useState<string>('');
   const [resultsTab, setResultsTab] = useState<'sponsors' | 'trace' | 'mediakit' | 'all'>('sponsors');
+  const [isInputCollapsed, setIsInputCollapsed] = useState<boolean>(false);
 
   // Initial load check
   useEffect(() => {
@@ -52,6 +53,7 @@ export const App: React.FC = () => {
       const data: AuditResponse = await res.json();
       setAuditData(data);
       setIsMock(Boolean(data.isMock));
+      setIsInputCollapsed(true);
     } catch (err: any) {
       console.error('Audit execution error:', err);
       setErrorMsg(err.message || 'Failed to complete cultural taste audit');
@@ -90,7 +92,7 @@ export const App: React.FC = () => {
             Turn Audience Taste into Quantifiable Brand Partnerships
           </h2>
           <p style={{ fontSize: '14px', color: 'var(--text-muted)', marginTop: '4px' }}>
-            Powered by <strong>Qloo's Cultural Taste AI</strong>. Autonomous cross-domain signal resolution, empirical brand affinity ranking, and pitch letters with verified field citations.
+            Powered by <strong>Qloo's Cultural Taste AI</strong>. Cross-domain signal resolution, brand affinity ranking, and pitch letters where every number links to the Qloo response field it came from.
             {/* Source: https://docs.qloo.com/reference/qloo-llm-hackathon-developer-guide */}
           </p>
         </div>
@@ -111,7 +113,12 @@ export const App: React.FC = () => {
         )}
 
         {/* Input Panel */}
-        <InputPanel onRunAudit={handleRunAudit} isLoading={isLoading} />
+        <InputPanel
+          onRunAudit={handleRunAudit}
+          isLoading={isLoading}
+          isCollapsed={isInputCollapsed}
+          onToggleCollapse={() => setIsInputCollapsed(!isInputCollapsed)}
+        />
 
         {/* Loading Spinner Indicator */}
         {isLoading && (
@@ -290,7 +297,7 @@ export const App: React.FC = () => {
             Built for the <strong>Qloo Agentic Hackathon: Agents, but with taste</strong>
           </div>
           <div>
-            API: <code>https://hackathon.api.qloo.com</code> • Zero Hallucination Guarantee
+            API: <code>https://hackathon.api.qloo.com</code> • Every number links to the Qloo response field it came from
           </div>
         </div>
       </footer>

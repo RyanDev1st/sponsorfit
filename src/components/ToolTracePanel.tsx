@@ -33,7 +33,7 @@ export const ToolTracePanel: React.FC<ToolTracePanelProps> = ({ trace }) => {
             gap: '8px',
           }}
         >
-          <span>🤖</span> Autonomous Agent Tool Execution Trace
+          <span>🤖</span> Agent Tool Execution Trace
         </h3>
         <span style={{ fontSize: '12px', fontFamily: 'var(--text-mono)', color: 'var(--text-muted)' }}>
           4 verified tool steps

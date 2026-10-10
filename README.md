@@ -5,177 +5,191 @@
 
 ---
 
+## Live Demo
+
+- **URL:** [https://sponsorfit.vercel.app](https://sponsorfit.vercel.app) *(pending deploy — connect GitHub repository to Vercel Hobby)*
+- **Source Repository:** [https://github.com/RyanDev1st/sponsorfit](https://github.com/RyanDev1st/sponsorfit)
+
+---
+
 ## Visual End-to-End Walkthrough (1440x900)
 
-| Step 1: Cultural Audience Input | Step 2: 4-Step Autonomous Agent Execution | Step 3: Verified Rankings, Media Kit & Pitches |
+| 1. Cultural Audience Profile | 2. 4-Step Agent Execution Trace | 3. Ranked Sponsors Above the Fold |
 | :---: | :---: | :---: |
-| ![01 Input Form](docs/screenshots/01-input.png) | ![02 Agent Trace](docs/screenshots/02-agent-trace.png) | ![03 Results & Media Kit](docs/screenshots/03-results.png) |
+| ![01 Input Form](docs/screenshots/01-input.png) | ![02 Agent Trace](docs/screenshots/02-agent-trace.png) | ![03 Results Above the Fold](docs/screenshots/03-results.png) |
 
 ---
 
-## 1. Problem & Executive Pitch
+## 1. The Problem
 
-Independent newsletter publishers, podcasters, and boutique media creators struggle to win brand sponsorships. They send pitch decks citing basic, flat metrics ("we have 35,000 monthly listeners aged 25–40"), competing against algorithmic ad exchanges. Meanwhile, premium brands (e.g., Oatly, Aesop, Patagonia, Kinto) seek authentic cultural alignment but have no empirical method to verify whether a creator's niche audience truly overlaps with their brand values.
+Independent newsletter writers, podcasters, and boutique media creators struggle to win brand sponsorships. Today, they pitch prospective sponsors using generic vanity metrics:
+> *"We have 35,000 monthly listeners aged 25–40."*
 
-**SponsorFit** solves this with an autonomous cultural intelligence agent powered by **Qloo's Cultural Taste Graph** ([Qloo Developer Guide](https://docs.qloo.com/reference/qloo-llm-hackathon-developer-guide)):
+This forces creators into direct price competition with algorithmic ad networks and programmatic display exchanges. Meanwhile, premium brands (such as Aesop, Oatly, Kinto, and Patagonia) seek authentic cultural resonance, but have no objective way to evaluate whether a niche creator's audience truly shares their brand values.
 
-1. **Entity Resolution (`/search`):** Ground creator audience affinity seeds into canonical Qloo URN entities.
-2. **Taste Graph Ingestion (`/v2/insights`):** Query high-confidence cross-domain brand affinities and explainability drivers.
-3. **Deterministic Ranking Engine:** Rank prospective sponsors by empirical affinity multipliers against the candidate set sample mean ($A_i / \bar{A}$).
-4. **Cultural Media Kit & Grounded Pitch Writer:** Generate actionable brand pitches and one-page media kits where **every single statistic cites an exact response field from Qloo's API**—eliminating hallucination.
+Traditional sponsor matching fails because it evaluates demographic proxies (age, location, gender) rather than actual cultural taste.
 
 ---
 
-## 2. API Provisioning Disclosure ("Mock Until Key")
+## 2. How It Works
 
-> **Current Status:** Qloo Hackathon API keys are provisioned manually by hackathon organizers.  
-> SponsorFit includes a **transparent, production-identical mock layer** that defaults to offline mode when `QLOO_API_KEY` is omitted or empty.
+SponsorFit runs an autonomous cultural intelligence agent that maps creator audience affinities into ranked sponsor brand partnerships using the **Qloo Taste Graph** ([Qloo Developer Guide](https://docs.qloo.com/reference/qloo-llm-hackathon-developer-guide)).
 
-- **Offline Mode:** The UI displays a prominent amber badge (`MOCK DATA (PROVISIONING API KEY)`). All shapes, URNs, affinity scores, and explainability signals exactly mirror the official Qloo LLM Hackathon OpenAPI specification (`https://hackathon.api.qloo.com`).
-- **Live Mode:** Once your hackathon API key is issued, set `QLOO_API_KEY=your_key` in `.env` (or Vercel environment variables). The client immediately switches to live queries against `https://hackathon.api.qloo.com` using the required `X-Api-Key` header with zero code changes.
-
----
-
-## 3. Quickstart & Local Setup
-
-### Prerequisites
-- Node.js 18+ (tested on Node 20 / 22 / 24)
-- npm 9+
-
-### Installation & Run
-
-```bash
-# 1. Install dependencies
-npm install
-
-# 2. Configure environment (optional, defaults to mock mode)
-cp env.example .env
-# Edit .env if you have a Qloo Hackathon API key:
-# QLOO_API_KEY=your_key_here
-
-# 3. Run unit & integration test suite (16 tests across all globs)
-npm test
-
-# 4. Start local development server (Vite dev server + embedded API mock middleware)
-npm run dev
-```
-
-Visit [http://localhost:5173](http://localhost:5173) in your browser.
-
-### Building for Production
-
-```bash
-# Compile TypeScript and bundle frontend SPA to dist/
-npm run build
-
-# Preview production build locally
-npm run preview
-```
-
-### End-to-End CDP Automation Script
-
-```bash
-# Run headless Edge CDP automation script to drive the UI, verify zero console errors, and capture screenshots:
-node scripts/capture-e2e.mjs
-```
-
----
-
-## 4. Agent Architecture & Zero Hallucination Guarantee
+The pipeline executes in 4 explicit steps:
 
 ```
   [User Cultural Seeds]
       (e.g., A24, Phoebe Bridgers, Severance, Tartine Bakery)
                │
                ▼
-┌────────────────────────────────────────────────────────┐
-│ Step 1: Entity Resolution (qloo_search_entities)       │
-│ Endpoint: /search?query=...&types=...                  │
-│ Output: Canonical URNs (e.g. urn:entity:movie:...)     │
-└────────────────────────────────────────────────────────┘
+┌────────────────────────────────────────────────────────────────────────┐
+│ Step 1: Entity Resolution (qloo_search_entities)                       │
+│ Code: api/qloo-client.mjs (searchEntities), api/agent.mjs (Step 1)      │
+│ Endpoint: GET https://hackathon.api.qloo.com/search?query=...          │
+│ Output: Canonical Qloo URN entities (film, music, TV, dining)          │
+└────────────────────────────────────────────────────────────────────────┘
                │
                ▼
-┌────────────────────────────────────────────────────────┐
-│ Step 2: Taste Graph Traversal (qloo_get_insights)      │
-│ Endpoint: /v2/insights                                 │
-│ Params: filter.type=urn:entity:brand                   │
-│         signal.interests.entities=<URNs>               │
-│         feature.explainability=true                    │
-│ Output: Brand affinities & cross-domain fingerprints   │
-└────────────────────────────────────────────────────────┘
+┌────────────────────────────────────────────────────────────────────────┐
+│ Step 2: Taste Graph Traversal (qloo_get_insights)                      │
+│ Code: api/qloo-client.mjs (getInsights), api/agent.mjs (Step 2)        │
+│ Endpoint: GET https://hackathon.api.qloo.com/v2/insights               │
+│ Params: filter.type=urn:entity:brand, feature.explainability=true      │
+│ Output: Raw candidate brand affinities & cross-domain overlap signals │
+└────────────────────────────────────────────────────────────────────────┘
                │
                ▼
-┌────────────────────────────────────────────────────────┐
-│ Step 3: Deterministic Ranking Engine                   │
-│ Math: Multiplier = round(affinity / mean(sample), 2)   │
-│ Sorting: Descending affinity, confidence weighting     │
-└────────────────────────────────────────────────────────┘
+┌────────────────────────────────────────────────────────────────────────┐
+│ Step 3: Deterministic Ranking Engine                                   │
+│ Code: api/agent.mjs (rankBrands)                                       │
+│ Math: Multiplier = round(affinity / mean(candidate_affinities), 2)     │
+│ Output: Sorted sponsor brands with exact explainability driver signals │
+└────────────────────────────────────────────────────────────────────────┘
                │
                ▼
-┌────────────────────────────────────────────────────────┐
-│ Step 4: Grounded Media Kit & Pitch Letter Writer       │
-│ Strict Provenance: Every statistic links to:           │
-│   • results.entities[i].affinity                       │
-│   • results.entities[i].query.explainability.signals   │
-│   • results.entities[i].tags                           │
-└────────────────────────────────────────────────────────┘
+┌────────────────────────────────────────────────────────────────────────┐
+│ Step 4: Grounded Media Kit & Pitch Writer                              │
+│ Code: api/agent.mjs (synthesizeMediaKitAndPitches)                     │
+│ Output: Cultural Media Kit & Cold Outreach Pitch Letters where every   │
+│         number links directly to its Qloo API response field path      │
+└────────────────────────────────────────────────────────────────────────┘
 ```
 
-### Exact Provenance Citations
-Every pitch letter and media kit bullet highlights its underlying Qloo response field:
-- **Affinity Score:** `results.entities[i].affinity` (e.g., `0.94`)
-- **Index Multiplier:** Derived against candidate sample mean $\bar{A}$ (e.g., `1.32x vs sample mean`)
-- **Driver Signal:** `results.entities[i].query.explainability.signals[j].influence` (e.g., `+34%`)
-- **Category Alignment:** `results.entities[i].tags` (e.g., `specialty-coffee`, `editorial`)
+### Key Files in the Architecture
+- [`api/qloo-client.mjs`](api/qloo-client.mjs): Official Qloo API client targeting `https://hackathon.api.qloo.com` with `X-Api-Key` authentication and transparent mock fallback.
+- [`api/agent.mjs`](api/agent.mjs): 4-step autonomous orchestration pipeline executing entity resolution, taste graph traversal, deterministic ranking math, and grounded pitch synthesis.
+- [`api/handler.mjs`](api/handler.mjs): Framework-neutral `(Request) => Promise<Response>` handler handling `/api/health`, `/api/search`, and `/api/audit`.
+- [`api/[...path].mjs`](api/[...path].mjs): Vercel Serverless Function catch-all adapter.
+- [`src/App.tsx`](src/App.tsx): Editorial React 19 UI with responsive view switcher tabs and compact summary bar keeping results above the fold at 1440x900.
+- [`src/components/SponsorList.tsx`](src/components/SponsorList.tsx): Ranked sponsor cards displaying one-line fit rationales, affinity score bars, and shared tags.
+- [`src/components/MediaKitAndPitches.tsx`](src/components/MediaKitAndPitches.tsx): One-page Cultural Media Kit with markdown export and tabbed cold outreach pitch letters with one-click copy.
 
 ---
 
-## 5. Free Hosting Preparation
+## 3. The Honesty Design
 
-SponsorFit is engineered for $0 budget zero-friction deployment.
+To avoid ungrounded marketing claims and metric hallucinations, SponsorFit adheres to strict mathematical provenance:
 
-### Option A: Vercel Hobby Tier (Primary Target)
-
-Vercel configuration is pre-wired in [`vercel.json`](vercel.json) and [`api/[...path].mjs`](api/[...path].mjs):
-- **Vite SPA build:** Pre-configured with `"framework": "vite"`, `"buildCommand": "npm run build"`, and `"outputDirectory": "dist"` (Reference: [Vercel Vite Documentation](https://vercel.com/docs/frameworks/vite)).
-- **Serverless API Catch-All:** `api/[...path].mjs` adapts incoming requests directly to the framework-neutral handler (Reference: [Vercel Functions Documentation](https://vercel.com/docs/functions)).
-- **Clean Rewrites:** Routes `/api/(.*)` to the serverless function adapter and all other paths to `/index.html` for client routing.
-
-#### Vercel Environment Variables
-In your Vercel Project Dashboard (`Settings` → `Environment Variables`), configure:
-1. `QLOO_API_KEY`: *(Optional)* Your official Qloo Hackathon API key. If omitted, the app runs gracefully in offline mock mode with the amber badge.
-2. `GEMINI_API_KEY`: *(Optional)* Google Gemini API key if enabling live dynamic LLM pitch writing (defaults to deterministic zero-hallucination template writer if omitted).
-
-#### Vercel Hobby Fair Use & Terms Compliance
-Under [Vercel Fair Use Guidelines](https://vercel.com/docs/limits/fair-use-guidelines):
-> *"The Hobby plan is for personal, non-commercial use. If you are using Vercel for your business or monetized project, you must upgrade to Pro."*
-
-SponsorFit is a non-commercial, open-source educational hackathon submission with zero paywalls, zero ads, and zero revenue generation. It strictly complies with the Vercel Hobby plan terms.
-
-### Option B: Cloudflare Workers (Zero-Cost Fallback)
-
-Because [`api/handler.mjs`](api/handler.mjs) is written purely in Web Standard APIs (`Request` and `Response`), it can run on Cloudflare Workers without modification:
-- Free tier includes **100,000 requests per day** and unlimited edge deployments.
-- Reference: [Cloudflare Workers Platform Pricing](https://developers.cloudflare.com/workers/platform/pricing/).
+1. **Explicit Field Citations:** Every single metric presented in the UI, media kit, and pitch letters links to the exact JSON response path from the Qloo API:
+   - Affinity Score: `results.entities[i].affinity`
+   - Key Driver Pull: `results.entities[i].query.explainability.signals[0].influence`
+   - Shared Category Tags: `results.entities[i].tags`
+2. **Deterministic Multiplier Derivation:** Relative index multipliers are calculated strictly against the candidate set sample mean:
+   $$\text{Multiplier} = \frac{A_i}{\bar{A}}$$
+   Every pitch letter explicitly discloses: `[derived: affinity / mean(sample)]`.
+3. **Automated Honesty Test:** [`api/honesty-audit.test.mjs`](api/honesty-audit.test.mjs) runs during every CI build to assert that:
+   - Each number in the ranking and media kit matches an exact fixture entity property.
+   - Every citation string links to a valid field path.
+   - Generated pitch letters contain zero ungrounded comparisons (no unbacked "outperforming" or unsourced percentage claims).
 
 ---
 
-## 6. Verification & Test Evidence
+## 4. Mock vs. Live Mode Note
 
-Run the full test suite using glob patterns:
+- **Why Mock Mode Exists:** Qloo Hackathon API keys are issued manually by organizers via application form ([Qloo Developer Guide](https://docs.qloo.com/reference/qloo-llm-hackathon-developer-guide)).
+- **Transparent Disclosure:** When running without `QLOO_API_KEY`, the application displays an amber badge in the header: `MOCK DATA (PROVISIONING API KEY)`.
+- **Exact Shape Integrity:** The mock fixtures ([`api/mocks/`](api/mocks/)) exactly mirror the official OpenAPI schema for `/search` and `/v2/insights`.
+- **Zero-Code Live Switch:** Once a live hackathon key is provided in `QLOO_API_KEY`, the client immediately targets `https://hackathon.api.qloo.com` with zero code changes.
+
+---
+
+## 5. Running Locally
+
+### Prerequisites
+- Node.js 18+ (tested on Node 20, 22, 24)
+- npm 9+
+
+### Commands
+
 ```bash
-node --test "api/**/*.test.mjs"
+# 1. Clone repository
+git clone https://github.com/RyanDev1st/sponsorfit.git
+cd sponsorfit
+
+# 2. Install dependencies
+npm install
+
+# 3. Configure environment variables (optional, defaults to mock mode)
+cp env.example .env
+
+# 4. Start local development server (Vite SPA + embedded API mock middleware)
+npm run dev
 ```
 
-### Verified Test Suite (16 of 16 Passing):
-- `api/qloo-client.test.mjs`: Tests mock fallback, custom base URL, `X-Api-Key` header injection, and parameter encoding.
-- `api/agent.test.mjs`: Tests full 4-step autonomous audit pipeline, ranking order, and pitch provenance generation.
-- `api/handler.test.mjs`: Tests HTTP routing, `/api/health`, `/api/search`, `/api/audit`, and CORS preflight.
-- `api/honesty-audit.test.mjs`: **Mathematical honesty verification**: Asserts that every number in the sponsor rankings, media kit, and pitches matches exact fixture fields and contains zero ungrounded marketing claims.
-- `api/vercel-adapter.test.mjs`: Tests `api/[...path].mjs` handling standard Web `Request` objects in mock mode.
+Open [http://localhost:5173](http://localhost:5173) in your browser.
 
 ---
 
-## 7. License
+## 6. Deploying to Vercel (Free Hobby Tier)
 
-MIT License. Designed and crafted for the Qloo Hackathon 2026.
+SponsorFit is pre-configured for deployment to Vercel Hobby ($0 budget):
+
+1. Push your fork or repo to GitHub.
+2. In [Vercel](https://vercel.com/), click **Add New Project** and import the `sponsorfit` repository.
+3. Vercel automatically detects [`vercel.json`](vercel.json), the Vite framework preset, and [`api/[...path].mjs`](api/[...path].mjs).
+4. *(Optional)* Under **Environment Variables**, set:
+   - `QLOO_API_KEY`: Your Qloo Hackathon API key.
+   - `GEMINI_API_KEY`: Google Gemini API key if enabling live dynamic LLM synthesis.
+5. Click **Deploy**.
+
+> **Terms Compliance:** Under [Vercel Fair Use Guidelines](https://vercel.com/docs/limits/fair-use-guidelines):  
+> *"The Hobby plan is for personal, non-commercial use."*  
+> SponsorFit is an open-source educational hackathon project with zero monetization and qualifies under Hobby terms.
+
+---
+
+## 7. Tests & Verification
+
+Run the automated test suite using glob patterns:
+
+```bash
+# Run all unit, integration, honesty, and Vercel adapter tests (16 tests)
+npm test
+
+# Build production bundle
+npm run build
+
+# Run headless CDP browser automation script (captures 1440x900 screenshots with console validation)
+node scripts/capture-e2e.mjs
+```
+
+### Test Coverage Highlights:
+- `api/qloo-client.test.mjs`: Live request construction, header injection, and mock fallback.
+- `api/agent.test.mjs`: 4-step autonomous orchestration and deterministic ranking math.
+- `api/handler.test.mjs`: HTTP routing, health checks, search queries, and CORS preflight.
+- `api/honesty-audit.test.mjs`: Mathematical verification that every metric traces to a fixture field.
+- `api/vercel-adapter.test.mjs`: Web Standard `Request` handling in Vercel function adapter.
+
+---
+
+## 8. Limitations
+
+1. **Awaiting Manual API Key Issuance:** Until the hackathon API key is manually approved and provisioned, queries run against exact-shape mock fixtures.
+2. **Entity Coverage:** Recommendations depend on entities present in Qloo's cultural taxonomy. Highly obscure micro-influencers or uncataloged local brands may require broader parent category seeds.
+3. **Template vs. LLM Writing:** In offline mode without `GEMINI_API_KEY`, pitch letters and media kits use deterministic template synthesis to ensure 100% mathematical fidelity. Dynamic variations are enabled only when `GEMINI_API_KEY` is present.
+
+---
+
+## License
+
+MIT License. Copyright (c) 2026 SponsorFit contributors.
