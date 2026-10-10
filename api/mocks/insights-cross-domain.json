@@ -1,0 +1,28 @@
+{
+  "success": true,
+  "duration": 0.185,
+  "results": {
+    "domains": {
+      "music": [
+        { "name": "Boygenius", "affinity": 0.961, "tags": ["indie rock", "alternative", "folk"] },
+        { "name": "Sufjan Stevens", "affinity": 0.895, "tags": ["folk", "baroque pop", "indie"] },
+        { "name": "Japanese Breakfast", "affinity": 0.874, "tags": ["indie pop", "experimental"] }
+      ],
+      "cinema": [
+        { "name": "Past Lives", "affinity": 0.934, "tags": ["drama", "romance", "a24"] },
+        { "name": "Aftersun", "affinity": 0.912, "tags": ["drama", "coming-of-age", "indie"] },
+        { "name": "Tár", "affinity": 0.868, "tags": ["psychological drama", "music", "cinema"] }
+      ],
+      "dining_places": [
+        { "name": "Four Barrel Coffee", "affinity": 0.892, "tags": ["specialty coffee", "san francisco"] },
+        { "name": "Square Diner", "affinity": 0.835, "tags": ["retro diner", "tribeca", "new york"] },
+        { "name": "Superiority Burger", "affinity": 0.819, "tags": ["vegetarian", "east village", "craft"] }
+      ],
+      "literature": [
+        { "name": "Trick Mirror (Jia Tolentino)", "affinity": 0.908, "tags": ["essays", "cultural critique"] },
+        { "name": "Crying in H Mart (Michelle Zauner)", "affinity": 0.895, "tags": ["memoir", "food", "grief"] },
+        { "name": "Severance (Ling Ma)", "affinity": 0.862, "tags": ["satire", "post-apocalyptic", "workplace"] }
+      ]
+    }
+  }
+}

@@ -1,0 +1,147 @@
+{
+  "success": true,
+  "duration": 0.128,
+  "results": {
+    "entities": [
+      {
+        "id": "qloo_brand_aesop_01",
+        "name": "Aesop",
+        "type": "urn:entity:brand",
+        "affinity": 0.942,
+        "category": "personal_care",
+        "tags": ["luxury", "sustainable", "botanical", "design-forward", "minimalism"],
+        "query": {
+          "explainability": {
+            "signals": [
+              {
+                "entity_id": "qloo_ent_a24_01",
+                "entity_name": "A24",
+                "influence": 0.820
+              },
+              {
+                "entity_id": "qloo_ent_phoebe_02",
+                "entity_name": "Phoebe Bridgers",
+                "influence": 0.785
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "qloo_brand_fellow_02",
+        "name": "Fellow Products",
+        "type": "urn:entity:brand",
+        "affinity": 0.887,
+        "category": "appliances_and_kitchenware",
+        "tags": ["specialty coffee", "minimalist design", "craft lifestyle", "pour-over"],
+        "query": {
+          "explainability": {
+            "signals": [
+              {
+                "entity_id": "qloo_ent_tartine_04",
+                "entity_name": "Tartine Bakery",
+                "influence": 0.912
+              },
+              {
+                "entity_id": "qloo_ent_a24_01",
+                "entity_name": "A24",
+                "influence": 0.654
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "qloo_brand_patagonia_03",
+        "name": "Patagonia",
+        "type": "urn:entity:brand",
+        "affinity": 0.841,
+        "category": "apparel_outdoor",
+        "tags": ["environmental stewardship", "outdoor", "ethical manufacturing", "slow fashion"],
+        "query": {
+          "explainability": {
+            "signals": [
+              {
+                "entity_id": "qloo_ent_phoebe_02",
+                "entity_name": "Phoebe Bridgers",
+                "influence": 0.741
+              },
+              {
+                "entity_id": "qloo_ent_tartine_04",
+                "entity_name": "Tartine Bakery",
+                "influence": 0.612
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "qloo_brand_sonos_04",
+        "name": "Sonos",
+        "type": "urn:entity:brand",
+        "affinity": 0.815,
+        "category": "electronics",
+        "tags": ["premium audio", "home acoustic", "smart home", "audiophile"],
+        "query": {
+          "explainability": {
+            "signals": [
+              {
+                "entity_id": "qloo_ent_phoebe_02",
+                "entity_name": "Phoebe Bridgers",
+                "influence": 0.852
+              },
+              {
+                "entity_id": "qloo_ent_severance_03",
+                "entity_name": "Severance",
+                "influence": 0.583
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "qloo_brand_muji_05",
+        "name": "Muji",
+        "type": "urn:entity:brand",
+        "affinity": 0.792,
+        "category": "retail_home_goods",
+        "tags": ["japanese minimalism", "stationery", "unbranded quality", "lifestyle"],
+        "query": {
+          "explainability": {
+            "signals": [
+              {
+                "entity_id": "qloo_ent_a24_01",
+                "entity_name": "A24",
+                "influence": 0.710
+              },
+              {
+                "entity_id": "qloo_ent_tartine_04",
+                "entity_name": "Tartine Bakery",
+                "influence": 0.640
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "qloo_brand_nordvpn_06",
+        "name": "NordVPN",
+        "type": "urn:entity:brand",
+        "affinity": 0.312,
+        "category": "cybersecurity_software",
+        "tags": ["vpn", "mass utility", "cybersecurity"],
+        "query": {
+          "explainability": {
+            "signals": [
+              {
+                "entity_id": "qloo_ent_severance_03",
+                "entity_name": "Severance",
+                "influence": 0.280
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

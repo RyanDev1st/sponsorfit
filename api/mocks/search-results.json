@@ -1,0 +1,69 @@
+{
+  "success": true,
+  "duration": 0.042,
+  "results": [
+    {
+      "id": "qloo_ent_a24_01",
+      "name": "A24",
+      "type": "urn:entity:brand",
+      "properties": {
+        "tags": ["independent film", "cinema", "art house", "cult culture", "editorial"],
+        "category": "entertainment_studio"
+      }
+    },
+    {
+      "id": "qloo_ent_phoebe_02",
+      "name": "Phoebe Bridgers",
+      "type": "urn:entity:artist",
+      "properties": {
+        "tags": ["indie rock", "folk", "singer-songwriter", "sad indie"],
+        "category": "musician"
+      }
+    },
+    {
+      "id": "qloo_ent_severance_03",
+      "name": "Severance",
+      "type": "urn:entity:tv_show",
+      "properties": {
+        "tags": ["psychological thriller", "sci-fi", "workplace dystopia", "critically acclaimed"],
+        "category": "television"
+      }
+    },
+    {
+      "id": "qloo_ent_tartine_04",
+      "name": "Tartine Bakery",
+      "type": "urn:entity:place",
+      "properties": {
+        "tags": ["artisan sourdough", "pastry", "san francisco", "craft food"],
+        "category": "dining_bakery"
+      }
+    },
+    {
+      "id": "qloo_brand_aesop_01",
+      "name": "Aesop",
+      "type": "urn:entity:brand",
+      "properties": {
+        "tags": ["luxury", "skincare", "sustainable", "botanical"],
+        "category": "personal_care"
+      }
+    },
+    {
+      "id": "qloo_brand_fellow_02",
+      "name": "Fellow Products",
+      "type": "urn:entity:brand",
+      "properties": {
+        "tags": ["specialty coffee", "minimalist design", "craft kitchenware"],
+        "category": "appliances_and_kitchenware"
+      }
+    },
+    {
+      "id": "qloo_brand_patagonia_03",
+      "name": "Patagonia",
+      "type": "urn:entity:brand",
+      "properties": {
+        "tags": ["outdoor", "environmental", "apparel"],
+        "category": "apparel_outdoor"
+      }
+    }
+  ]
+}
