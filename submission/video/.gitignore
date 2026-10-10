@@ -1,0 +1,6 @@
+audio/
+frames/
+*.mp4
+*.wav
+*.jpg
+!qc/*.png

@@ -1,0 +1,67 @@
+1
+00:00:02,000 --> 00:00:10,000
+Every month, thousands of talented newsletter writers and indie podcasters pitch brands for sponsorships using the exact same generic stats: follower counts and age demographics.
+
+2
+00:00:10,000 --> 00:00:18,500
+But premium brands like Aesop, Oatly, and Patagonia don't buy demographics, they buy authentic cultural alignment.
+
+3
+00:00:18,500 --> 00:00:27,240
+Welcome to SponsorFit: the autonomous agent that turns audience cultural taste into quantifiable brand partnerships using Qloo's Taste Graph.
+
+4
+00:00:27,240 --> 00:00:35,500
+Instead of asking for follower numbers, SponsorFit asks for your audience's cultural fingerprint.
+
+5
+00:00:35,500 --> 00:00:44,210
+Here, our culture podcast audience loves A24 films, indie songwriter Phoebe Bridgers, the show Severance, and Tartine Bakery. We click Run Cultural Sponsorship Audit.
+
+6
+00:00:44,210 --> 00:00:52,000
+Under the hood, the agent executes four transparent steps. First, it resolves each seed keyword into canonical Qloo URN entities.
+
+7
+00:00:52,000 --> 00:01:00,000
+Next, it queries Qloo's v2 insights endpoint for brand affinities and cross-domain overlap.
+
+8
+00:01:00,000 --> 00:01:08,010
+Then, our ranking engine deterministically benchmarks candidate brands against sample averages. Every step records exact parameters, row counts, and latency.
+
+9
+00:01:08,010 --> 00:01:16,000
+Notice how our collapsed summary keeps all ranked sponsors above the fold.
+
+10
+00:01:16,000 --> 00:01:24,000
+In this sample dataset, the engine surfaces benchmarked brand matches: Aesop shows a sample affinity of ninety-four percent, thirty-two percent above the sample mean, driven by audience interest in A24 films.
+
+11
+00:01:24,000 --> 00:01:32,010
+In live mode with a provisioned API key, SponsorFit queries Qloo's live Taste Graph with identical transparent field citations.
+
+12
+00:01:32,010 --> 00:01:39,500
+SponsorFit generates a publication-ready Cultural Media Kit. In one click, creators can download a clean Markdown dossier backed by zero-hallucination data.
+
+13
+00:01:39,500 --> 00:01:47,110
+You're no longer begging for ad reads, you're presenting empirical consumer preference data.
+
+14
+00:01:47,110 --> 00:01:56,500
+Switching to pitch letters, SponsorFit formats personalized cold outreach emails using this sample audit data.
+
+15
+00:01:56,500 --> 00:02:06,420
+Notice the difference: every claim cites verifiable Qloo API response fields, proving to the brand's partnership team why this audience over-indexes on their products. One click copies the pitch ready for your email client.
+
+16
+00:02:06,420 --> 00:02:14,000
+SponsorFit is open-source under MIT, tested with 16 automated test suites, and prepped for zero-cost deployment on Vercel Hobby.
+
+17
+00:02:14,000 --> 00:02:21,090
+Built from scratch for the Qloo Agentic Hackathon: because AI agents should have taste. Thank you!
