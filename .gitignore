@@ -9,3 +9,8 @@ dist/
 docs/gitlab/spec/*.md
 docs/gitlab/spec/*.json
 docs/gitlab/spec/flow_config_schema.py
+
+# Video build artifacts
+submission/video/*.mp4
+submission/video/audio/
+submission/video/frames/
