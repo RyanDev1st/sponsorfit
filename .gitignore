@@ -4,3 +4,8 @@ dist/
 .env.local
 .DS_Store
 *.log
+
+# Third-party GitLab spec copies (download via docs/gitlab/SETUP.md; not redistributed)
+docs/gitlab/spec/*.md
+docs/gitlab/spec/*.json
+docs/gitlab/spec/flow_config_schema.py

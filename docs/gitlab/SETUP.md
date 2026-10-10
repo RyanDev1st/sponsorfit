@@ -37,7 +37,7 @@ This guide provides a rapid step-by-step checklist to take SponsorFit from the l
     git remote add gitlab https://gitlab.com/<provisioned-subgroup-path>/sponsorfit.git
     git push -u gitlab main
     ```
-  - **Expected Result:** Full SponsorFit repository (including `.gitlab-ci.yml`, `.gitlab/duo/`, and `scripts/guard/`) is hosted inside your hackathon project.
+  - **Expected Result:** Full SponsorFit repository (including `.gitlab-ci.yml`, `.gitlab/duo/flows/honesty-guard.yaml`, and `scripts/guard/`) is hosted inside your hackathon project.
   - **Doc Link:** [GitLab Project Import Guide](https://docs.gitlab.com/ee/user/project/import/repo_by_url.html)
 
 - [ ] **Step 4: Verify Default Branch Settings**
@@ -56,23 +56,41 @@ This guide provides a rapid step-by-step checklist to take SponsorFit from the l
 
 - [ ] **Step 6: Register Custom Flow (`honesty-guard.yaml`)**
   - **Action:**
-    1. Verify that `.gitlab/duo/flows/honesty-guard.yaml` is present in the repository root.
-    2. In GitLab UI, open the **AI Catalog** or **GitLab Duo Flow Builder** (in VS Code extension or web editor).
-    3. Point the flow definition to `.gitlab/duo/flows/honesty-guard.yaml`.
-  - **Expected Result:** Flow `sponsorfit-honesty-guard` appears active under project workflows, listening to `merge_request` triggers.
-  - **Doc Link:** [GitLab Custom Flow Registration](https://docs.gitlab.com/user/duo_agent_platform/flows/custom/)
-  - *Note:* If the UI catalog interface differs slightly in your provisioned tier, flow registration via `.gitlab/duo/flows/` repository path is automatically picked up (`UNVERIFIED` exact UI button label depending on cloud rollout).
+    1. Verify that `.gitlab/duo/flows/honesty-guard.yaml` is present in the repository.
+    2. In the GitLab UI, open **AI > Flows** (or **AI Catalog**).
+    3. Click **Enable Flow** and select **Custom Flow from Repository**, specifying `.gitlab/duo/flows/honesty-guard.yaml`.
+  - **Expected Result:** Flow `sponsorfit-honesty-guard` is registered and active in `ambient` environment.
+  - **Doc Link:** [GitLab Custom Flow User Docs](https://docs.gitlab.com/user/duo_agent_platform/flows/custom/)
+
+- [ ] **Step 7: Configure Flow Triggers in GitLab UI**
+  - *Context:* In the Flow Registry v1 specification, triggers are configured in the GitLab UI, not in the flow YAML.
+  - **Action:** Navigate to **AI > Triggers** (or click **Add Trigger** on the enabled flow) and create triggers for the following documented event types:
+    - **Trigger 1 — Merge Request Events:** Select event type `Merge request events`, condition `Created` and `Ready`. Target flow: `sponsorfit-honesty-guard`.
+    - **Trigger 2 — Assign Reviewer:** Select event type `Assign reviewer`. Target: when the Honesty Guard service account or Duo agent is assigned as reviewer.
+    - **Trigger 3 — Mention:** Select event type `Mention`. Target: when `@honesty-guard` is mentioned in an MR note/comment.
+  - **Expected Result:** Triggers appear active under **AI > Triggers**, automatically initiating the flow when developers open MRs or tag the agent.
+  - **Doc Link:** [GitLab Duo Trigger Event Types Docs](https://docs.gitlab.com/user/duo_agent_platform/triggers/#trigger-event-types)
+
+- [ ] **Step 8: Configure Custom Agent in UI (Copy-Paste Reference)**
+  - *Context:* Custom agents in the AI Catalog are created via the UI using system prompts and tools.
+  - **Action:** Navigate to **AI > Agents** > **New Agent**:
+    - Name: `SponsorFit Honesty Guard`
+    - Visibility: `Public`
+    - Tools: Select `run_command`, `read_file`, `edit_file`, `get_merge_request`, and `create_merge_request_note`.
+    - System Prompt: Copy and paste the system prompt from [`agents/honesty-guard/agent.yaml`](../../agents/honesty-guard/agent.yaml).
+  - **Expected Result:** Custom agent is published in project catalog with documented tool bindings.
+  - **Doc Link:** [GitLab Custom Agents Docs](https://docs.gitlab.com/user/duo_agent_platform/agents/custom/)
 
 ---
 
 ## Phase 4: CI/CD Runner Verification & Self-Managed Setup ($0 Cost)
 
-- [ ] **Step 7: Check SaaS Shared Runner Status**
+- [ ] **Step 9: Check SaaS Shared Runner Status**
   - **Action:** Navigate to **Settings** > **CI/CD** > **Runners**. Inspect whether shared instance runners are enabled and active.
   - **Expected Result:** Green status indicating shared runners are available.
   - **Doc Link:** [GitLab Shared Runners](https://docs.gitlab.com/ee/ci/runners/runners_scope.html)
 
-- [ ] **Step 8 (Conditional Fallback): Register Local Self-Managed Runner**
+- [ ] **Step 10 (Conditional Fallback): Register Local Self-Managed Runner**
   - *Context:* If SaaS shared runners request credit card identity verification for anti-abuse checks, register a local runner to run pipelines for $0 without providing card details.
   - **Action (Windows PowerShell):**
     ```powershell
@@ -106,7 +124,7 @@ This guide provides a rapid step-by-step checklist to take SponsorFit from the l
 
 ## Phase 5: Verification & Supervised Demo Merge Request
 
-- [ ] **Step 9: Run Baseline Pipeline on `main`**
+- [ ] **Step 11: Run Baseline Pipeline on `main`**
   - **Action:** Navigate to **Build** > **Pipelines** and click **Run pipeline** on branch `main`.
   - **Expected Result:**
     1. `test_suite` stage passes (16 API tests + 9 Guard tests).
@@ -115,23 +133,22 @@ This guide provides a rapid step-by-step checklist to take SponsorFit from the l
     4. `pages` stage deploys `public/` directory.
   - **Doc Link:** [GitLab Pipelines](https://docs.gitlab.com/ee/ci/pipelines/)
 
-- [ ] **Step 10: Verify GitLab Pages Live URL**
+- [ ] **Step 12: Verify GitLab Pages Live URL**
   - **Action:** Navigate to **Deploy** > **Pages**. Open the generated Pages URL (e.g. `https://<subgroup>.gitlab.io/sponsorfit`).
   - **Expected Result:** SponsorFit SPA loads in browser, displaying cultural input forms and Amber `MOCK DATA` badge at $0 hosting cost.
   - **Doc Link:** [GitLab Pages Administration](https://docs.gitlab.com/user/project/pages/)
 
-- [ ] **Step 11: Execute Supervised Test Merge Request**
+- [ ] **Step 13: Execute Supervised Test Merge Request**
   - **Action:**
     1. Create a test branch: `git checkout -b test/unbacked-claim-demo`.
     2. Add an unbacked claim to `README.md` (e.g. `SponsorFit generates 500% more engagement`).
     3. Push and open a Merge Request targeting `main`.
   - **Expected Result:**
-    - Pipeline executes `honesty_audit`.
-    - Duo Honesty Guard agent posts the structured MR audit report.
-    - Findings highlight `🔴 Blocking: 500% more engagement`.
-    - Pipeline blocks auto-merge and requests maintainer supervision.
+    - UI trigger activates `sponsorfit-honesty-guard` flow on `Merge request events`.
+    - `honesty_auditor` runs static audit; `claim_classifier` categorizes `500%` as `blocking`.
+    - `maintainer_approval` (`HumanInputComponent`) pauses execution and presents approval prompt in UI.
   - **Doc Link:** [GitLab MR Discussions & Code Quality](https://docs.gitlab.com/ee/user/project/merge_requests/)
 
-- [ ] **Step 12: Supervised Human Resolution**
-  - **Action:** Maintainer replies with `/approve-fixes` or commits the empirical derivation tag.
-  - **Expected Result:** Agent applies approved changes, unblocks the pipeline, and permits merge.
+- [ ] **Step 14: Supervised Human Resolution**
+  - **Action:** Maintainer clicks **Approve** on the HumanInputComponent prompt in the flow UI or responds to unblock remediation.
+  - **Expected Result:** `fix_remediator` applies verified derivation tag (`[derived: affinity / mean(sample)]`), CI pipeline passes, and merge request is unblocked.
