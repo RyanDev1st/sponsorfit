@@ -1,0 +1,163 @@
+# GitLab Duo Flow Registry v1 Specification: SponsorFit Honesty Guard
+#
+# Official GitLab Documentation References:
+# - Custom flows schema: https://docs.gitlab.com/user/duo_agent_platform/flows/custom/
+# - Flow Registry v1: https://docs.gitlab.com/user/duo_agent_platform/flows/custom/#flow-registry-v1
+# - Custom agents: https://docs.gitlab.com/user/duo_agent_platform/agents/custom/
+# - AI Catalog: https://docs.gitlab.com/user/duo_agent_platform/
+#
+# Target Category: Best Supervised Agent (Path B - Bring Your Own Code)
+# Characteristics: Agent proposes actions, classifies risk, and strictly WAITS
+# for maintainer human approval at designated checkpoints before applying changes.
+
+version: "v1"
+environment: ambient
+
+metadata:
+  name: "sponsorfit-honesty-guard"
+  title: "SponsorFit Honesty Guard Flow"
+  description: "Supervised lifecycle agent auditing numeric claims, enforcing data provenance, and gating MR merges and release notes."
+  version: "1.0.0"
+  author: "SponsorFit Maintainers"
+  license: "MIT"
+  catalog_visibility: "public"
+
+triggers:
+  - id: "on_merge_request"
+    type: "merge_request"
+    events: ["opened", "synchronize", "reopened"]
+    goal: "Audit numeric claims in documentation and UI copy, execute honesty test suite, and present structured findings for maintainer supervision."
+  - id: "on_post_merge"
+    type: "merge_request"
+    events: ["merged"]
+    goal: "Generate audit-backed release notes, compile static Pages deployment checklist, and request maintainer release sign-off."
+
+components:
+  - id: "honesty_auditor"
+    type: "agent"
+    name: "Claim Provenance Auditor"
+    description: "Inspects MR diffs, runs test suites, and evaluates claims against provenance-registry.json."
+    prompt_ref: "prompts.audit_claims"
+    tools:
+      - name: "execute_command"
+        command: "npm test && node scripts/guard/honesty-guard.mjs --output honesty-report.json"
+      - name: "read_report"
+        path: "honesty-report.json"
+      - name: "post_mr_comment"
+        target: "$CI_MERGE_REQUEST_IID"
+
+  - id: "supervised_remediator"
+    type: "agent"
+    name: "Supervised Remediator"
+    description: "Applies approved citation tags or metric corrections following explicit human authorization."
+    prompt_ref: "prompts.apply_supervised_remediation"
+    supervised: true
+    checkpoint:
+      type: "human_approval"
+      trigger_phrase: "/approve-fixes"
+      allowed_roles: ["maintainer", "owner"]
+      timeout_hours: 48
+    tools:
+      - name: "apply_patch"
+      - name: "git_commit_and_push"
+        author: "GitLab Duo Honesty Guard <duo-guard@gitlab.local>"
+      - name: "resolve_mr_discussion"
+
+  - id: "release_curator"
+    type: "agent"
+    name: "Release & Deployment Curator"
+    description: "Synthesizes audited release changelogs and deployment checklists post-merge."
+    prompt_ref: "prompts.curate_release_notes"
+    supervised: true
+    checkpoint:
+      type: "human_approval"
+      trigger_phrase: "/approve-release"
+      allowed_roles: ["maintainer", "owner"]
+    tools:
+      - name: "read_git_log"
+      - name: "draft_gitlab_release"
+
+prompts:
+  audit_claims:
+    model: "gitlab-duo-default"
+    system: |
+      You are the SponsorFit Honesty Guard, a specialized GitLab Duo agent enforcing mathematical integrity and truth in technical copy.
+      Your responsibility is to eliminate hallucinated marketing metrics, ungrounded benchmark comparisons, and missing citation links.
+
+      When a Merge Request is opened or updated:
+      1. Review the git diff for numeric figures, multipliers (e.g. 1.42x), percentages (e.g. 500%), or scale claims (e.g. 250M+).
+      2. Ingest the output of `scripts/guard/honesty-guard.mjs` (honesty-report.json) and `api/honesty-audit.test.mjs`.
+      3. Classify each finding into exactly one of three categories:
+         - auto-fixable: Missing standard derivation citation tags (e.g. appending '[derived: affinity / mean(sample)]') or formatting anomalies.
+         - needs-human: Contextual metrics that need author or maintainer clarification.
+         - blocking: Unbacked marketing superlatives, unsubstantiated multipliers, or banned phrases (e.g. unbacked '500% more engagement').
+      4. Format and post a structured MR discussion comment using the standard Honesty Guard template.
+      5. If blocking items exist, mark the review status as BLOCKED and instruct the maintainer that human approval is required before merge.
+      6. If auto-fixable items exist, wait for the maintainer to comment with `/approve-fixes` before taking any action.
+
+  apply_supervised_remediation:
+    model: "gitlab-duo-default"
+    system: |
+      You are the Supervised Remediator for SponsorFit Honesty Guard.
+      CRITICAL SUPERVISION RULE: You must NEVER push code or modify files without explicit human maintainer approval.
+      Only execute when the human maintainer replies with `/approve-fixes` in the discussion thread.
+      When authorized:
+      1. Inspect the approved findings in honesty-report.json.
+      2. Apply the exact suggested derivation and citation tags to the affected files.
+      3. Create a clean commit with message 'style(audit): apply supervised Honesty Guard provenance tags'.
+      4. Push to the source branch and mark the discussion as resolved.
+
+  curate_release_notes:
+    model: "gitlab-duo-default"
+    system: |
+      You are the Release & Deployment Curator for SponsorFit.
+      After an MR is merged into the default branch:
+      1. Review merged changes against the honesty audit log.
+      2. Draft semantic release notes detailing:
+         - Mathematical additions or algorithmic adjustments verified against Qloo fixture schemas.
+         - Clean copy changes with verified provenance.
+         - Static GitLab Pages deployment verification status (mock mode SPA).
+      3. Present the draft in the project activity feed and wait for maintainer sign-off (`/approve-release`).
+
+routers:
+  - id: "mr_triage_router"
+    conditions:
+      - condition: "report.summary.blocking > 0"
+        next_step: "block_pipeline"
+      - condition: "report.summary.autoFixable > 0"
+        next_step: "await_human_approval"
+      - condition: "report.summary.passed == true"
+        next_step: "mark_ready_for_merge"
+
+flow:
+  name: "honesty_guard_pipeline"
+  sequence:
+    - step: 1
+      id: "run_audit"
+      component: "honesty_auditor"
+      action: "execute_command"
+      output_variable: "audit_result"
+
+    - step: 2
+      id: "publish_findings"
+      component: "honesty_auditor"
+      action: "post_mr_comment"
+      input_data: "$audit_result"
+
+    - step: 3
+      id: "supervision_checkpoint"
+      component: "supervised_remediator"
+      action: "await_approval"
+      wait_for: "checkpoint.human_approval"
+
+    - step: 4
+      id: "apply_fixes_if_approved"
+      component: "supervised_remediator"
+      action: "apply_patch"
+      condition: "event.command == '/approve-fixes'"
+
+    - step: 5
+      id: "post_merge_release"
+      component: "release_curator"
+      action: "curate_release_notes"
+      trigger_on: "post_merge"

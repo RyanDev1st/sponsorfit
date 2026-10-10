@@ -1,0 +1,52 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "name": "SponsorFit Provenance & Honesty Registry",
+  "version": "1.0.0",
+  "description": "Ground truth constants, approved technical specifications, and provenance rules for SponsorFit copy and documentation.",
+  "projectBaselines": {
+    "dimensions": ["1440x900"],
+    "audienceExamples": ["35,000 monthly listeners", "35,000"],
+    "pipelineSteps": [1, 2, 3, 4],
+    "port": 5173,
+    "httpStatuses": [200, 204, 400, 404, 500],
+    "runtimeSpecs": ["Node.js 18+", "Node 20", "Node 22", "Node 24", "npm 9+", "React 19", "Vite 6"],
+    "benchmarks": {
+      "sampleMeanBaselineAffinity": 0.61,
+      "maxAffinity": 0.87,
+      "topMultiplier": 1.42
+    }
+  },
+  "allowedCitationSignatures": [
+    "\\[field:\\s*results\\.entities\\[\\d+\\]\\.[a-zA-Z0-9_.]+\\]",
+    "\\[derived:\\s*affinity\\s*/\\s*mean\\(sample\\)\\]",
+    "results\\.entities\\[\\d+\\]\\.(affinity|tags|influence|name)",
+    "https://docs\\.qloo\\.com/reference/qloo-llm-hackathon-developer-guide",
+    "https://hackathon\\.api\\.qloo\\.com"
+  ],
+  "unbackedMarketingSignatures": [
+    {
+      "pattern": "(\\+?\\d{3,}%\\s*(?:more\\s+)?(?:engagement|reach|conversions?|roi|growth))",
+      "severity": "blocking",
+      "reason": "Unbacked percentage performance claim without empirical test run or benchmark baseline.",
+      "suggestedFix": "Replace with empirical sample multiplier: '1.42x cultural affinity multiplier [derived: affinity / mean(sample)]'."
+    },
+    {
+      "pattern": "\\b250M\\+",
+      "severity": "blocking",
+      "reason": "Unbacked 250M+ scale exaggeration without documented platform telemetry.",
+      "suggestedFix": "Remove exaggerated figure or cite specific verified dataset slice."
+    },
+    {
+      "pattern": "\\b(?:massively\\s+)?outperforming\\s+(?:industry|category)?\\s*benchmarks?\\b",
+      "severity": "blocking",
+      "reason": "Ungrounded comparative superiority claim without external control group comparison.",
+      "suggestedFix": "State deterministic mathematical multiplier relative to sample mean."
+    },
+    {
+      "pattern": "\\bguaranteed\\s+\\d+x\\s+ROI\\b",
+      "severity": "blocking",
+      "reason": "Unverified financial return guarantee violating platform truth in advertising policies.",
+      "suggestedFix": "Disclose index score: 'affinity index 1.42x vs candidate set average'."
+    }
+  ]
+}

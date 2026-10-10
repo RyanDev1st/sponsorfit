@@ -1,0 +1,88 @@
+# GitLab CI/CD Pipeline Configuration: SponsorFit
+#
+# Official Documentation References:
+# - GitLab CI/CD YAML syntax: https://docs.gitlab.com/ci/yaml/
+# - GitLab Pages static sites: https://docs.gitlab.com/user/project/pages/
+# - GitLab Duo Agent integration in CI: https://docs.gitlab.com/user/duo_agent_platform/flows/custom/
+# - Self-Managed Runner registration: https://docs.gitlab.com/runner/
+#
+# Pipeline Architecture:
+# test (unit/integrity) -> honesty-audit (provenance check) -> build (SPA compilation) -> deploy (GitLab Pages)
+
+stages:
+  - test
+  - honesty-audit
+  - build
+  - deploy
+
+default:
+  image: node:20-alpine
+  cache:
+    key:
+      files:
+        - package-lock.json
+    paths:
+      - node_modules/
+
+# -----------------------------------------------------------------------------
+# Stage 1: Automated Unit & API Integrity Tests
+# -----------------------------------------------------------------------------
+test_suite:
+  stage: test
+  before_script:
+    - npm ci --prefer-offline || npm install
+  script:
+    - echo "Executing core SponsorFit test suite..."
+    - npm test
+    - echo "Executing Honesty Guard internal unit tests..."
+    - node --test "scripts/guard/*.test.mjs"
+
+# -----------------------------------------------------------------------------
+# Stage 2: Mathematical Honesty & Provenance Audit
+# -----------------------------------------------------------------------------
+honesty_audit:
+  stage: honesty-audit
+  before_script:
+    - npm ci --prefer-offline || npm install
+  script:
+    - echo "Executing Honesty Guard claim extraction and verification..."
+    - node scripts/guard/honesty-guard.mjs --output honesty-report.json --strict
+  artifacts:
+    name: "honesty-audit-$CI_COMMIT_SHORT_SHA"
+    when: always
+    expire_in: 1 week
+    paths:
+      - honesty-report.json
+
+# -----------------------------------------------------------------------------
+# Stage 3: Static SPA Compilation (Vite + React 19)
+# -----------------------------------------------------------------------------
+build_spa:
+  stage: build
+  before_script:
+    - npm ci --prefer-offline || npm install
+  script:
+    - echo "Building static single-page application in mock mode..."
+    - npm run build
+  artifacts:
+    name: "sponsorfit-dist-$CI_COMMIT_SHORT_SHA"
+    expire_in: 1 week
+    paths:
+      - dist/
+
+# -----------------------------------------------------------------------------
+# Stage 4: GitLab Pages Deployment (100% Free Static Hosting)
+# -----------------------------------------------------------------------------
+pages:
+  stage: deploy
+  dependencies:
+    - build_spa
+  script:
+    - rm -rf public
+    - cp -r dist public
+    - echo "SponsorFit static deployment bundle staged for GitLab Pages."
+  artifacts:
+    paths:
+      - public
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
