@@ -58,6 +58,7 @@ export async function handleRequest(request, env = process.env) {
     if (request.method === 'GET' && pathname === '/api/health') {
       return jsonResponse({
         status: 'ok',
+        service: 'SponsorFit API',
         isMock: qlooClient.isMockMode(),
         hasLiveQloo: !qlooClient.isMockMode(),
         hasGemini: Boolean(geminiKey && geminiKey.trim().length > 0),

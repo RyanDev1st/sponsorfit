@@ -13,6 +13,7 @@ export const App: React.FC = () => {
   const [isMock, setIsMock] = useState<boolean>(true);
   const [selectedBrandPitch, setSelectedBrandPitch] = useState<string>('');
   const [errorMsg, setErrorMsg] = useState<string>('');
+  const [resultsTab, setResultsTab] = useState<'sponsors' | 'trace' | 'mediakit' | 'all'>('sponsors');
 
   // Initial load check
   useEffect(() => {
@@ -89,7 +90,8 @@ export const App: React.FC = () => {
             Turn Audience Taste into Quantifiable Brand Partnerships
           </h2>
           <p style={{ fontSize: '14px', color: 'var(--text-muted)', marginTop: '4px' }}>
-            Powered by <strong>Qloo's Taste Graph</strong> (250M+ cultural entities). Autonomous cross-domain signal resolution, empirical brand affinity ranking, and pitch letters with verified field citations.
+            Powered by <strong>Qloo's Cultural Taste AI</strong>. Autonomous cross-domain signal resolution, empirical brand affinity ranking, and pitch letters with verified field citations.
+            {/* Source: https://docs.qloo.com/reference/qloo-llm-hackathon-developer-guide */}
           </p>
         </div>
 
@@ -132,31 +134,143 @@ export const App: React.FC = () => {
           </div>
         )}
 
-        {/* Execution Results */}
+        {/* Execution Results View Selector */}
+        {!isLoading && auditData && (
+          <div
+            id="results-view-nav"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              backgroundColor: '#FFFFFF',
+              padding: '12px 18px',
+              borderRadius: 'var(--radius-md)',
+              border: '1px solid var(--border-light)',
+              boxShadow: 'var(--shadow-subtle)',
+              flexWrap: 'wrap',
+              gap: '12px',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-muted)' }}>
+                Audit Results:
+              </span>
+              <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-main)' }}>
+                {auditData.creatorName} ({auditData.audienceSize})
+              </span>
+            </div>
+
+            <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+              <button
+                type="button"
+                id="tab-sponsors-btn"
+                onClick={() => setResultsTab('sponsors')}
+                style={{
+                  padding: '6px 14px',
+                  borderRadius: 'var(--radius-sm)',
+                  fontSize: '12px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  border: '1px solid',
+                  borderColor: resultsTab === 'sponsors' ? 'var(--accent-terracotta)' : 'var(--border-light)',
+                  backgroundColor: resultsTab === 'sponsors' ? 'var(--accent-terracotta-light)' : '#FFFFFF',
+                  color: resultsTab === 'sponsors' ? 'var(--accent-terracotta)' : 'var(--text-main)',
+                }}
+              >
+                🏆 Ranked Sponsors ({auditData.rankedSponsors.length})
+              </button>
+              <button
+                type="button"
+                id="tab-trace-btn"
+                onClick={() => setResultsTab('trace')}
+                style={{
+                  padding: '6px 14px',
+                  borderRadius: 'var(--radius-sm)',
+                  fontSize: '12px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  border: '1px solid',
+                  borderColor: resultsTab === 'trace' ? 'var(--accent-terracotta)' : 'var(--border-light)',
+                  backgroundColor: resultsTab === 'trace' ? 'var(--accent-terracotta-light)' : '#FFFFFF',
+                  color: resultsTab === 'trace' ? 'var(--accent-terracotta)' : 'var(--text-main)',
+                }}
+              >
+                🤖 Agent Trace ({auditData.toolTrace.length} steps)
+              </button>
+              <button
+                type="button"
+                id="tab-mediakit-btn"
+                onClick={() => setResultsTab('mediakit')}
+                style={{
+                  padding: '6px 14px',
+                  borderRadius: 'var(--radius-sm)',
+                  fontSize: '12px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  border: '1px solid',
+                  borderColor: resultsTab === 'mediakit' ? 'var(--accent-terracotta)' : 'var(--border-light)',
+                  backgroundColor: resultsTab === 'mediakit' ? 'var(--accent-terracotta-light)' : '#FFFFFF',
+                  color: resultsTab === 'mediakit' ? 'var(--accent-terracotta)' : 'var(--text-main)',
+                }}
+              >
+                📄 Media Kit & Pitches
+              </button>
+              <button
+                type="button"
+                id="tab-all-btn"
+                onClick={() => setResultsTab('all')}
+                style={{
+                  padding: '6px 14px',
+                  borderRadius: 'var(--radius-sm)',
+                  fontSize: '12px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  border: '1px solid',
+                  borderColor: resultsTab === 'all' ? 'var(--accent-terracotta)' : 'var(--border-light)',
+                  backgroundColor: resultsTab === 'all' ? 'var(--accent-terracotta-light)' : '#FFFFFF',
+                  color: resultsTab === 'all' ? 'var(--accent-terracotta)' : 'var(--text-main)',
+                }}
+              >
+                📜 Full Dossier
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Execution Results Content */}
         {!isLoading && auditData && (
           <>
             {/* 1. Live Tool Execution Trace */}
-            <ToolTracePanel trace={auditData.toolTrace} />
+            {(resultsTab === 'trace' || resultsTab === 'all') && (
+              <ToolTracePanel trace={auditData.toolTrace} />
+            )}
 
             {/* 2. Ranked Sponsor Brands */}
-            <SponsorList
-              sponsors={auditData.rankedSponsors}
-              onSelectSponsorForPitch={(brand) => {
-                setSelectedBrandPitch(brand);
-                const el = document.getElementById('media-kit-section');
-                if (el) el.scrollIntoView({ behavior: 'smooth' });
-              }}
-            />
+            {(resultsTab === 'sponsors' || resultsTab === 'all') && (
+              <>
+                <SponsorList
+                  sponsors={auditData.rankedSponsors}
+                  onSelectSponsorForPitch={(brand) => {
+                    setSelectedBrandPitch(brand);
+                    setResultsTab('mediakit');
+                    const el = document.getElementById('media-kit-section');
+                    if (el) el.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                />
 
-            {/* 3. Cross-Domain Cultural Fingerprint */}
-            <CrossDomainFingerprint domains={auditData.crossDomainFingerprint} />
+                {/* 3. Cross-Domain Cultural Fingerprint */}
+                <CrossDomainFingerprint domains={auditData.crossDomainFingerprint} />
+              </>
+            )}
 
             {/* 4. Cultural Media Kit & Cold Pitches */}
-            <MediaKitAndPitches
-              mediaKit={auditData.mediaKit}
-              pitches={auditData.pitches}
-              selectedBrandName={selectedBrandPitch}
-            />
+            {(resultsTab === 'mediakit' || resultsTab === 'all') && (
+              <MediaKitAndPitches
+                mediaKit={auditData.mediaKit}
+                pitches={auditData.pitches}
+                selectedBrandName={selectedBrandPitch}
+              />
+            )}
           </>
         )}
       </main>

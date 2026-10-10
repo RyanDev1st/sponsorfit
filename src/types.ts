@@ -35,6 +35,8 @@ export interface ToolTraceStep {
   step: number;
   tool: string;
   args: Record<string, any>;
+  argsSummary?: string;
+  rowsReturned?: number;
   summary: string;
   latencyMs: number;
   isMock?: boolean;

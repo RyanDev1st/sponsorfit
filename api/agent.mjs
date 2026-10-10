@@ -55,6 +55,8 @@ export class SponsorFitAgent {
       step: 1,
       tool: 'qloo_search_entities',
       args: { queries: seedQueries },
+      argsSummary: `queries: ${seedQueries.join(', ')}`,
+      rowsReturned: resolvedEntities.length,
       summary: `Resolved ${resolvedEntities.length} of ${seedQueries.length} seed entities via Qloo /search`,
       latencyMs: Date.now() - step1Start,
       output: resolvedEntities.map((e) => ({ id: e.id, name: e.name, type: e.type })),
@@ -75,6 +77,7 @@ export class SponsorFitAgent {
       signalEntityIds: entityIds,
     });
 
+    const candidateCount = brandInsights.results?.entities?.length || 0;
     toolTrace.push({
       step: 2,
       tool: 'qloo_get_insights',
@@ -83,7 +86,9 @@ export class SponsorFitAgent {
         signalEntityIds: entityIds,
         explainability: true,
       },
-      summary: `Retrieved ${brandInsights.results?.entities?.length || 0} candidate sponsor brands and cross-domain fingerprint`,
+      argsSummary: `filter: brand, signals: ${entityIds.length}, explainability: true`,
+      rowsReturned: candidateCount,
+      summary: `Retrieved ${candidateCount} candidate sponsor brands and cross-domain fingerprint`,
       latencyMs: Date.now() - step2Start,
       isMock: Boolean(brandInsights.isMock),
     });
@@ -92,11 +97,14 @@ export class SponsorFitAgent {
     const step3Start = Date.now();
     const rawBrands = brandInsights.results?.entities || [];
     const rankedSponsors = this.rankBrands(rawBrands, resolvedEntities);
+    const baselineAffinity = rankedSponsors.baselineAffinity || 0.5;
 
     toolTrace.push({
       step: 3,
       tool: 'deterministic_ranking_engine',
       args: { candidateCount: rawBrands.length },
+      argsSummary: `candidates: ${rawBrands.length}, baselineMean: ${(baselineAffinity * 100).toFixed(1)}%`,
+      rowsReturned: rankedSponsors.length,
       summary: `Ranked top ${rankedSponsors.length} sponsors; top fit is ${rankedSponsors[0]?.name} (${((rankedSponsors[0]?.affinity || 0) * 100).toFixed(1)}% affinity)`,
       latencyMs: Date.now() - step3Start,
       topThree: rankedSponsors.slice(0, 3).map((b) => ({ name: b.name, affinity: b.affinity })),
@@ -110,6 +118,7 @@ export class SponsorFitAgent {
       resolvedEntities,
       topSponsors: rankedSponsors.slice(0, 3),
       allSponsors: rankedSponsors,
+      baselineAffinity,
       crossDomain: crossDomainInsights.results?.domains || {},
       isMock: Boolean(brandInsights.isMock),
     });
@@ -118,7 +127,9 @@ export class SponsorFitAgent {
       step: 4,
       tool: this.geminiApiKey ? 'gemini_grounded_writer' : 'deterministic_template_writer',
       args: { model: this.geminiApiKey ? DEFAULT_GEMINI_MODEL : 'deterministic-v1' },
-      summary: `Drafted Cultural Media Kit and ${synthesis.pitches.length} custom sponsor pitches with response field citations`,
+      argsSummary: `generator: ${this.geminiApiKey ? DEFAULT_GEMINI_MODEL : 'deterministic-template-v1'}`,
+      rowsReturned: synthesis.pitches.length + 1,
+      summary: `Synthesized Cultural Media Kit and ${synthesis.pitches.length} custom sponsor pitches with response field citations`,
       latencyMs: Date.now() - step4Start,
       usedLiveLlm: Boolean(this.geminiApiKey),
     });
@@ -149,13 +160,13 @@ export class SponsorFitAgent {
   rankBrands(brandEntities, resolvedSeeds) {
     if (!Array.isArray(brandEntities)) return [];
 
-    // Baseline benchmark (average affinity or lowest baseline in set)
+    // Baseline benchmark (average affinity across retrieved candidate set)
     const affinities = brandEntities.map((b) => Number(b.affinity || 0));
     const baselineAffinity = affinities.length > 0
       ? affinities.reduce((a, b) => a + b, 0) / affinities.length
       : 0.5;
 
-    return brandEntities
+    const sorted = brandEntities
       .map((brand, index) => {
         const affinity = Number(brand.affinity || 0);
         const multiplierVsBaseline = baselineAffinity > 0
@@ -192,6 +203,9 @@ export class SponsorFitAgent {
         };
       })
       .sort((a, b) => b.affinity - a.affinity);
+
+    sorted.baselineAffinity = baselineAffinity;
+    return sorted;
   }
 
   /**
@@ -199,7 +213,8 @@ export class SponsorFitAgent {
    * Strictly enforces that every metric comes directly from Qloo response fields.
    */
   async synthesizeMediaKitAndPitches(data) {
-    const { creatorName, audienceSize, resolvedEntities, topSponsors, allSponsors, crossDomain, isMock } = data;
+    const { creatorName, audienceSize, resolvedEntities, topSponsors, allSponsors, baselineAffinity, crossDomain, isMock } = data;
+    const baselinePercentStr = (Number(baselineAffinity || 0.5) * 100).toFixed(1);
 
     // Deterministic template synthesis (guarantees mathematical grounding)
     const mediaKit = {
@@ -217,7 +232,7 @@ export class SponsorFitAgent {
         brand: s.name,
         affinityScore: s.affinity,
         affinityFormatted: `${s.affinityPercent}%`,
-        affinityMultiplier: `${s.multiplierVsBaseline}x above category benchmark`,
+        affinityMultiplier: `${s.multiplierVsBaseline}x vs sample mean (${baselinePercentStr}%)`,
         category: s.category,
         sharedTags: s.tags,
         primaryCulturalDriver: s.topDriver
@@ -242,10 +257,10 @@ export class SponsorFitAgent {
       const body =
         `Dear ${sponsor.name} Partnerships Team,\n\n` +
         `I am writing from ${creatorName} (${audienceSize}). While standard creator pitches rely on vanity impressions, ` +
-        `we recently audited our audience through Qloo's cultural taste graph (250M+ entities).\n\n` +
-        `The data reveals an extraordinary behavioral alignment with ${sponsor.name}:\n` +
+        `we recently audited our audience through Qloo's cultural taste graph.\n\n` +
+        `The data reveals an empirical behavioral alignment with ${sponsor.name}:\n` +
         `• Taste Affinity Score: ${sponsor.affinityPercent}% [field: ${sponsor.trace.affinityField} = ${sponsor.affinity}]\n` +
-        `• Category Index: ${sponsor.multiplierVsBaseline}x above baseline creator benchmarks\n` +
+        `• Relative Fit Index: ${sponsor.multiplierVsBaseline}x vs sample mean (${baselinePercentStr}%) [derived: affinity / mean(sample)]\n` +
         `• Primary Driver: Listeners drawn to ${topSignalName} demonstrate a ${influenceVal}% affinity pull toward ${sponsor.name} ` +
         (sponsor.trace.topSignalField ? `[field: ${sponsor.trace.topSignalField} = ${sponsor.trace.topSignalInfluence}]\n` : '\n') +
         `• Shared Audience Tags: ${sponsor.tags.join(', ')} [field: ${sponsor.trace.tagsField}]\n\n` +

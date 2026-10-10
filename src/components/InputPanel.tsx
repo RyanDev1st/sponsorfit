@@ -78,7 +78,7 @@ export const InputPanel: React.FC<InputPanelProps> = ({ onRunAudit, isLoading })
             1. Define Audience Cultural Fingerprint
           </h2>
           <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '2px' }}>
-            Enter cultural anchors your audience loves (artists, directors, films, cafes, brands). Qloo's taste graph will cross-reference 250M+ entities to uncover non-obvious sponsor matches.
+            Enter cultural anchors your audience loves (artists, directors, films, cafes, brands). Qloo's taste graph cross-references entities across cultural domains to uncover non-obvious sponsor matches.
           </p>
         </div>
 
