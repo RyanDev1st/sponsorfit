@@ -3,43 +3,43 @@
 **Target Hackathon Track:** Path B (Bring Your Own Code) — Best Supervised Agent ($4,500 Prize)  
 **Total Video Target Duration:** 2 minutes 40 seconds (Strict limit: ≤ 2:45)  
 **Repository:** [https://github.com/RyanDev1st/sponsorfit](https://github.com/RyanDev1st/sponsorfit)  
+**Flow Specification:** Flow Registry v1 (`.gitlab/duo/flows/honesty-guard.yaml`)  
 
 ---
 
 ## 1. Demo Narrative: Speed with Control
 
-In the era of AI-generated content and autonomous coding, marketing copy and developer documentation are increasingly polluted with hallucinated metrics and unbacked claims (e.g. *"increases conversion by 500%"*). 
+In the era of AI-generated content and autonomous coding, marketing copy and developer documentation are increasingly polluted with hallucinated metrics and ungrounded claims (e.g. *"increases conversion by 500%"*). 
 
-**SponsorFit Honesty Guard** is a supervised GitLab Duo Agent that demonstrates **"Speed with Control"**. Instead of letting autonomous agents blindly push changes or hallucinate claims, Honesty Guard audits code and copy against empirical ground truth, classifies risks, and strictly **waits for human maintainer authorization** at defined supervision gates before taking action.
+**SponsorFit Honesty Guard** is a supervised GitLab Duo Agent Flow built on the **Flow Registry v1** framework that demonstrates **"Speed with Control"**. Instead of letting autonomous agents blindly push changes or hallucinate claims, Honesty Guard audits code and copy against empirical ground truth, classifies risks via response schemas, and strictly **waits for human maintainer authorization** via a `HumanInputComponent` before taking any mutating action.
 
 ```
 ┌────────────────────────────────────────────────────────────────────────┐
-│                   Supervised Lifecycle State Machine                   │
+│             Supervised Lifecycle State Machine (Flow Registry v1)       │
 ├────────────────────────────────────────────────────────────────────────┤
 │                                                                        │
 │   [ Developer Opens MR ]                                               │
 │   Adds unbacked "+500% engagement" claim to README.md                  │
 │             │                                                          │
-│             ▼                                                          │
-│   [ Phase 1: Autonomous Audit ]                                        │
-│   GitLab Duo Flow executes honesty-guard.mjs & test suite              │
+│             ▼  (UI Trigger: Merge request events: Created)             │
+│   [ Step 1: honesty_auditor (AgentComponent) ]                         │
+│   Executes run_command (honesty-guard.mjs), read_file & get_mr_diff    │
 │             │                                                          │
 │             ▼                                                          │
-│   [ Phase 2: Structured Review ]                                       │
-│   Posts MR Comment: 🔴 Blocking violation, suggests 1.42x multiplier   │
+│   [ Step 2: claim_classifier (AgentComponent) ]                        │
+│   Outputs structured JSON schema: 1 blocking, 1.42x proposed fix       │
 │             │                                                          │
 │             ▼                                                          │
-│   [ SUPERVISION GATE #1 ] ──▶ Maintainer replies: "/approve-fixes"     │
-│   Agent WAITS for human       (or rejects MR)                          │
+│   [ Step 3: maintainer_approval (HumanInputComponent) ] ──▶ PAUSES     │
+│   Transitions to INPUT_REQUIRED. Displays approval prompt in UI        │
+│             │                                                          │
+│             ▼  (Maintainer clicks Approve / replies)                   │
+│   [ Step 4: fix_remediator (AgentComponent) ]                          │
+│   Applies verified derivation tag via edit_file & posts MR note        │
 │             │                                                          │
 │             ▼                                                          │
-│   [ Phase 3: Remediated Merge ]                                        │
-│   Agent applies empirical citation tag; pipeline turns green; merge   │
-│             │                                                          │
-│             ▼                                                          │
-│   [ SUPERVISION GATE #2 ] ──▶ Maintainer replies: "/approve-release"   │
-│   Agent drafts release notes  Release published to GitLab & Pages live │
-│   WAITS for final sign-off                                             │
+│   [ Step 5: End / Pipeline Green ]                                     │
+│   CI/CD pipeline runs green, MR merged, GitLab Pages static SPA live   │
 └────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -52,47 +52,45 @@ A developer submits a feature branch proposing to boost creator outreach. In `RE
 > *"Our new AI cultural match engine delivers **500% more engagement** for podcast sponsorships!"*
 
 ### Act 2: Autonomous Provenance Audit
-The GitLab Duo Flow (`honesty-guard.yaml`) triggers immediately on the MR:
-1. Executes `honesty_audit` job in `.gitlab-ci.yml`.
+The GitLab Duo Flow (`honesty-guard.yaml`) triggers automatically via the configured project trigger (`Merge request events`):
+1. **`honesty_auditor`** executes `node scripts/guard/honesty-guard.mjs --output honesty-report.json`.
 2. Static scanner detects `500%` matching unbacked marketing superlative regex without empirical fixture grounding.
-3. Flow generates `honesty-report.json`:
-   - `summary.blocking: 1`
-   - `summary.passed: false`
-4. Duo Agent posts structured MR note:
-   ```markdown
-   ## 🛡️ SponsorFit Honesty Guard — Audit Report
-   Status: ⛔ BLOCKED (Policy Compliance: Violations Detected)
-   
-   | Status | File & Line | Claim | Severity | Recommendation |
-   | :--- | :--- | :--- | :---: | :--- |
-   | 🔴 Blocking | `README.md:42` | `500%` | high | Replace with empirical sample multiplier: '1.42x cultural affinity multiplier [derived: affinity / mean(sample)]' |
-   
-   ### 🧑‍💻 Supervised Maintainer Checkpoint
-   > ⚠️ Action Required Before Merge: 1 blocking claim detected.
-   > Reply with `/approve-fixes` to authorize the agent to apply suggested empirical citations.
-   ```
+3. **`claim_classifier`** processes the audit result through `claim_classification_schema`:
+   - `overall_status: "blocked"`
+   - `blocking_count: 1`
+   - `proposed_fixes: "Replace '500% more engagement' with '1.42x cultural affinity multiplier [derived: affinity / mean(sample)]'"`
 
-### Act 3: Supervised Human Authorization Gate
-The autonomous loop halts. The MR merge button is disabled by the failed CI check.  
-The repository maintainer inspects the MR discussion and replies:
-> **Maintainer:** `/approve-fixes`
+### Act 3: Supervised Human Authorization Gate (`HumanInputComponent`)
+The flow reaches **`maintainer_approval`** (`HumanInputComponent`).
+- Execution pauses cleanly; workflow status transitions to `INPUT_REQUIRED`.
+- The GitLab UI presents an interactive approval prompt:
+  ```
+  Honesty Guard Audit Findings:
+  1 blocking claim detected in README.md: '500% more engagement'.
+
+  Proposed Remediations:
+  Replace with verified empirical metric: '1.42x cultural affinity multiplier [derived: affinity / mean(sample)]'.
+
+  Please review and approve applying the proposed fixes to this Merge Request.
+  [ Approve ]   [ Reject ]
+  ```
+- The maintainer inspects the finding and clicks **Approve**.
 
 ### Act 4: Remediated Patch & Clean Merge
-With explicit human authorization recorded in the event log:
-1. Duo Agent commits the suggested replacement:
-   > *"Our new AI cultural match engine delivers **1.42x cultural affinity multiplier** `[derived: affinity / mean(sample)]` for podcast sponsorships!"*
-2. CI pipeline re-executes:
+With human approval recorded in the flow state (`context:maintainer_approval.approval == "approve"`):
+1. Router directs execution to **`fix_remediator`**.
+2. Agent applies the fix to `README.md` using `edit_file`.
+3. Agent posts an audit summary note to the MR using `create_merge_request_note`.
+4. CI/CD pipeline runs automatically:
    - `test_suite`: 16 API tests + 9 Guard tests pass.
    - `honesty_audit`: 0 blocking claims; exits code 0.
    - `build_spa`: Vite compiles production SPA to `dist/`.
-3. Merge request turns green; maintainer merges the branch.
+   - `pages`: Deploys static bundle to GitLab Pages at $0.
+5. Merge request is unblocked and merged into `main`.
 
-### Act 5: Post-Merge Release Supervision
-Post-merge trigger activates the second supervised agent:
-1. Agent synthesizes release notes highlighting verified mathematical additions and zero ungrounded claims.
-2. Compiles deployment verification check for GitLab Pages (`public/` static bundle).
-3. Posts release preview asking: *"Ready to tag v0.2.0? Reply with `/approve-release`"*.
-4. Maintainer approves; release is published.
+### Act 5: Post-Merge Verification
+1. Maintainer inspects the merged commit on `main`.
+2. Verifies the live GitLab Pages static deployment loaded cleanly with zero ongoing infrastructure costs.
 
 ---
 
@@ -100,12 +98,12 @@ Post-merge trigger activates the second supervised agent:
 
 | Timestamp | Scene / Visual | Voiceover / Script Narration | On-Screen Action |
 | :--- | :--- | :--- | :--- |
-| **0:00 – 0:25** (25s) | **Title & Problem**<br>Screen: SponsorFit GitHub repo & architecture diagram. | *"Welcome to SponsorFit Honesty Guard. When AI builds post-code workflows, autonomous speed must never compromise factual honesty. Built for GitLab's 'Life After Code' hackathon, Honesty Guard is a supervised Duo agent that protects projects from hallucinated marketing and ungrounded metrics."* | Pan over `README.md` and show the 4-step Qloo Taste Graph pipeline. |
-| **0:25 – 0:55** (30s) | **The Dirty MR**<br>Screen: GitLab Merge Request UI. | *"Here, a developer opens an MR adding an exaggerated claim: '500% more engagement'. Traditional linters ignore this, but our GitLab Duo Flow triggers automatically on the merge request event."* | Show diff adding `500% more engagement` to `README.md`. Click **Create Merge Request**. |
-| **0:55 – 1:30** (35s) | **Autonomous Audit & Block**<br>Screen: GitLab MR discussion thread & CI pipeline. | *"The Honesty Guard flow executes our mathematical audit script and fixtures. It flags the 500% claim as a blocking violation, halts the pipeline, and posts a structured audit table with an exact empirical recommendation: 1.42x affinity multiplier."* | Zoom in on the Duo Agent's MR comment showing `⛔ BLOCKED` and the supervised maintainer checkpoint. |
-| **1:30 – 1:55** (25s) | **Supervised Human Gate**<br>Screen: Maintainer Duo Chat / Comment. | *"Because this is a supervised agent, it cannot push changes on its own. It waits for maintainer consent. The maintainer reviews the math and types `/approve-fixes`. Instantly, the agent applies the verified provenance tag to the branch."* | Type `/approve-fixes`. Show new commit authored by Duo Honesty Guard landing on the branch. |
-| **1:55 – 2:20** (25s) | **Pipeline Green & Deploy**<br>Screen: GitLab CI/CD Pipeline graph. | *"With the claim grounded, the pipeline re-runs: unit tests pass, honesty audit turns green, Vite compiles the SPA, and GitLab Pages deploys the mock-mode app at zero cost."* | Show pipeline stages: `test` -> `honesty-audit` -> `build` -> `pages`. Click Pages link to show live app loading. |
-| **2:20 – 2:40** (20s) | **Post-Merge Release Gate**<br>Screen: GitLab Releases draft. | *"Finally, post-merge, the curator agent drafts audit-backed release notes and pauses for human sign-off with `/approve-release`. Speed with control: that is true post-code automation on the GitLab Duo Agent Platform."* | Show release notes draft. Display closing graphic with repo and Devpost links. |
+| **0:00 – 0:25** (25s) | **Title & Problem**<br>Screen: SponsorFit GitHub repo & architecture diagram. | *"Welcome to SponsorFit Honesty Guard. When AI builds post-code workflows, autonomous speed must never compromise factual honesty. Built for GitLab's 'Life After Code' hackathon on the Flow Registry v1 spec, Honesty Guard is a supervised Duo flow that protects projects from hallucinated marketing and ungrounded metrics."* | Pan over `README.md` and show the 4-step Qloo Taste Graph pipeline. |
+| **0:25 – 0:55** (30s) | **The Dirty MR**<br>Screen: GitLab Merge Request UI. | *"Here, a developer opens an MR adding an exaggerated claim: '500% more engagement'. Traditional linters ignore this, but our GitLab Duo Flow triggers automatically via project merge request events."* | Show diff adding `500% more engagement` to `README.md`. Click **Create Merge Request**. |
+| **0:55 – 1:30** (35s) | **Autonomous Audit & Classifier**<br>Screen: GitLab Flow session execution view. | *"The flow executes the honesty_auditor agent using run_command, then passes findings to claim_classifier with a structured JSON response schema. It detects the 500% claim as a blocking violation and prepares the exact empirical replacement: 1.42x affinity multiplier."* | Show session log transitioning from `honesty_auditor` to `claim_classifier` with structured output. |
+| **1:30 – 1:55** (25s) | **Supervised Human Input Gate**<br>Screen: HumanInputComponent approval card in UI. | *"Because this is a supervised flow, it hits the HumanInputComponent. The workflow pauses in INPUT_REQUIRED status. It cannot modify files without maintainer consent. The maintainer reviews the prompt and clicks Approve."* | Zoom in on the `maintainer_approval` card showing findings and proposed fix. Click **Approve**. |
+| **1:55 – 2:20** (25s) | **Remediation & Pipeline Green**<br>Screen: GitLab CI/CD Pipeline graph & MR diff. | *"With approval recorded, fix_remediator applies the verified derivation tag using edit_file and posts a confirmation note. The CI pipeline turns green across all four stages, and GitLab Pages deploys the mock-mode app at zero cost."* | Show new commit landing on branch; pipeline stages `test` -> `honesty-audit` -> `build` -> `pages` turn green. |
+| **2:20 – 2:40** (20s) | **Conclusion & Compliance**<br>Screen: Summary slide with repo & spec links. | *"By combining Flow Registry v1 components, custom response schemas, and strict human-in-the-loop gates, SponsorFit delivers speed with control on the GitLab Duo Agent Platform."* | Display closing graphic with repo, spec, and Devpost links. |
 
 ---
 
