@@ -37,7 +37,18 @@ export function extractClaims(content, filePath = 'unknown') {
   // Patterns for claims
   const percentageRegex = /([+-]?\d+(?:\.\d+)?%)/g;
   const multiplierRegex = /(\b\d+(?:\.\d+)?x\b)/gi;
-  const largeScaleRegex = /(\b\d+(?:,\d+)*(?:\.\d+)?[MBKk]\b|\b\d{2,}(?:,\d{3})+\b)/g;
+  const largeScaleRegex = /(\b\d+(?:,\d+)*(?:\.\d+)?[MBKk]\b|\b\d{1,3}(?:,\d{3})+\b)/g;
+
+  // Adoption & social proof covered phrases:
+  // "trusted by N", "N+ users/creators/customers/brands/teams", "used by N", "join N", "N downloads", "rated N stars"
+  const adoptionPatterns = [
+    /\btrusted\s+by\s+(?:(?:~|over|almost|approx\.?|approximately)\s+)?(\d[\d,]*(?:\.\d+)?(?:[MBKk])?\+?|\d+)\b/gi,
+    /\b(\d[\d,]*(?:\.\d+)?(?:[MBKk])?)\+\s*(?:[a-zA-Z]+\s+)?(?:users|creators|customers|brands|teams)\b/gi,
+    /\bused\s+by\s+(?:(?:~|over|almost|approx\.?|approximately)\s+)?(\d[\d,]*(?:\.\d+)?(?:[MBKk])?\+?|\d+)\b/gi,
+    /\bjoin\s+(?:(?:~|over|almost|approx\.?|approximately)\s+)?(\d[\d,]*(?:\.\d+)?(?:[MBKk])?\+?|\d+)\b/gi,
+    /\b(\d[\d,]*(?:\.\d+)?(?:[MBKk])?\+?|\d+)\s+downloads?\b/gi,
+    /\brated\s+(?:(?:~|over|almost|approx\.?|approximately)\s+)?(\d[\d,]*(?:\.\d+)?(?:[MBKk])?\+?|\d+)\s+stars?\b/gi,
+  ];
 
   lines.forEach((lineText, idx) => {
     const lineNum = idx + 1;
@@ -46,41 +57,51 @@ export function extractClaims(content, filePath = 'unknown') {
       return;
     }
 
-    // 1. Percentage claims
-    let match;
-    while ((match = percentageRegex.exec(lineText)) !== null) {
+    const matchedSpans = [];
+
+    function addClaim(matchStr, type, index, spanLen = matchStr.length) {
+      const start = index;
+      const end = index + spanLen;
+      for (const span of matchedSpans) {
+        if (Math.max(start, span.start) < Math.min(end, span.end)) {
+          return;
+        }
+      }
+      matchedSpans.push({ start, end });
       claims.push({
         file: filePath,
         line: lineNum,
         rawLine: lineText.trim(),
-        match: match[1],
-        type: 'percentage',
-        index: match.index,
+        match: matchStr,
+        type,
+        index,
       });
+    }
+
+    // 1. Percentage claims
+    let match;
+    while ((match = percentageRegex.exec(lineText)) !== null) {
+      addClaim(match[1], 'percentage', match.index);
     }
 
     // 2. Multiplier claims
     while ((match = multiplierRegex.exec(lineText)) !== null) {
-      claims.push({
-        file: filePath,
-        line: lineNum,
-        rawLine: lineText.trim(),
-        match: match[1],
-        type: 'multiplier',
-        index: match.index,
-      });
+      addClaim(match[1], 'multiplier', match.index);
     }
 
-    // 3. Large quantities / numbers
+    // 3. Adoption & social proof claims
+    for (const pat of adoptionPatterns) {
+      pat.lastIndex = 0;
+      while ((match = pat.exec(lineText)) !== null) {
+        const numOffset = match[0].indexOf(match[1]);
+        const numIndex = numOffset >= 0 ? match.index + numOffset : match.index;
+        addClaim(match[1], 'adoption', numIndex, match[0].length);
+      }
+    }
+
+    // 4. Large quantities / numbers
     while ((match = largeScaleRegex.exec(lineText)) !== null) {
-      claims.push({
-        file: filePath,
-        line: lineNum,
-        rawLine: lineText.trim(),
-        match: match[1],
-        type: 'quantity',
-        index: match.index,
-      });
+      addClaim(match[1], 'quantity', match.index);
     }
   });
 
@@ -96,26 +117,7 @@ export function extractClaims(content, filePath = 'unknown') {
 export function classifyClaim(claim, registry = defaultRegistry) {
   const { match, rawLine, file, line } = claim;
 
-  // Check 1: Banned unbacked marketing superlative patterns
-  for (const rule of registry.unbackedMarketingSignatures) {
-    const re = new RegExp(rule.pattern, 'i');
-    if (re.test(rawLine)) {
-      return {
-        id: `HG-BLOCK-${line}-${Math.abs(hashString(match)) % 10000}`,
-        file,
-        line,
-        rawLine,
-        claim: match,
-        status: 'blocking',
-        severity: 'high',
-        reason: rule.reason,
-        suggestion: rule.suggestedFix,
-        autoFixable: false,
-      };
-    }
-  }
-
-  // Check 2: Explicit inline citations (e.g., [field: ...], [derived: ...])
+  // Check 1: Explicit inline citations (e.g., [field: ...], [derived: ...])
   for (const sig of registry.allowedCitationSignatures) {
     const re = new RegExp(sig, 'i');
     if (re.test(rawLine)) {
@@ -133,14 +135,15 @@ export function classifyClaim(claim, registry = defaultRegistry) {
     }
   }
 
-  // Check 3: Project baseline technical constants
-  const baselines = registry.projectBaselines;
+  // Check 2: Project baseline technical constants declared in provenance registry
+  const baselines = registry.projectBaselines || {};
   const isBaseline =
-    baselines.dimensions.some((d) => rawLine.includes(d)) ||
-    baselines.audienceExamples.some((a) => rawLine.includes(a)) ||
-    baselines.runtimeSpecs.some((s) => rawLine.includes(s)) ||
+    (baselines.dimensions && baselines.dimensions.some((d) => rawLine.includes(d))) ||
+    (baselines.audienceExamples &&
+      baselines.audienceExamples.some((a) => rawLine.includes(a) || match === String(a))) ||
+    (baselines.runtimeSpecs && baselines.runtimeSpecs.some((s) => rawLine.includes(s))) ||
     (baselines.port && match.includes(String(baselines.port))) ||
-    baselines.httpStatuses.some((status) => match === String(status));
+    (baselines.httpStatuses && baselines.httpStatuses.some((status) => match === String(status)));
 
   if (isBaseline) {
     return {
@@ -156,7 +159,80 @@ export function classifyClaim(claim, registry = defaultRegistry) {
     };
   }
 
-  // Check 4: Mathematical multipliers matching fixture benchmark
+  // Check 3: Banned unbacked marketing superlative patterns from registry
+  if (registry.unbackedMarketingSignatures) {
+    for (const rule of registry.unbackedMarketingSignatures) {
+      const re = new RegExp(rule.pattern, 'i');
+      if (re.test(rawLine)) {
+        return {
+          id: `HG-BLOCK-${line}-${Math.abs(hashString(match)) % 10000}`,
+          file,
+          line,
+          rawLine,
+          claim: match,
+          status: 'blocking',
+          severity: 'high',
+          reason: rule.reason,
+          suggestion: rule.suggestedFix,
+          autoFixable: false,
+        };
+      }
+    }
+  }
+
+  // Check 4: Covered adoption and social-proof claims without provenance
+  // ("trusted by N", "N+ users/creators/customers/brands/teams", "used by N", "join N", "N downloads", "rated N stars")
+  const adoptionSignatures = [
+    {
+      re: /\btrusted\s+by\s+(?:(?:~|over|almost|approx\.?|approximately)\s+)?(?:\d[\d,]*(?:\.\d+)?(?:[MBKk])?\+?|\d+)/i,
+      reason: 'Unsourced adoption claim ("trusted by N") without verified platform telemetry or provenance tag.',
+      suggestion: 'Remove unsourced adoption figure or cite verified provenance in registry.',
+    },
+    {
+      re: /\b(?:\d[\d,]*(?:\.\d+)?(?:[MBKk])?)\+\s*(?:[a-zA-Z]+\s+)?(?:users|creators|customers|brands|teams)\b/i,
+      reason: 'Unsourced user community scale claim ("N+ users/creators/customers/brands/teams") without documented telemetry or provenance tag.',
+      suggestion: 'Remove unsourced community scale figure or cite verified provenance in registry.',
+    },
+    {
+      re: /\bused\s+by\s+(?:(?:~|over|almost|approx\.?|approximately)\s+)?(?:\d[\d,]*(?:\.\d+)?(?:[MBKk])?\+?|\d+)/i,
+      reason: 'Unsourced usage adoption claim ("used by N") without verified telemetry or provenance tag.',
+      suggestion: 'Remove unsourced usage figure or cite verified provenance in registry.',
+    },
+    {
+      re: /\bjoin\s+(?:(?:~|over|almost|approx\.?|approximately)\s+)?(?:\d[\d,]*(?:\.\d+)?(?:[MBKk])?\+?|\d+)/i,
+      reason: 'Unsourced user count call-to-action ("join N") without verified registry backing.',
+      suggestion: 'Remove unsourced count or cite verified provenance in registry.',
+    },
+    {
+      re: /\b(?:\d[\d,]*(?:\.\d+)?(?:[MBKk])?\+?|\d+)\s+downloads?\b/i,
+      reason: 'Unsourced download count claim ("N downloads") without verified registry backing.',
+      suggestion: 'Remove download count or cite verified provenance in registry.',
+    },
+    {
+      re: /\brated\s+(?:(?:~|over|almost|approx\.?|approximately)\s+)?(?:\d[\d,]*(?:\.\d+)?(?:[MBKk])?\+?|\d+)\s+stars?\b/i,
+      reason: 'Unsourced review or star rating social proof ("rated N stars") without verified review source.',
+      suggestion: 'Remove star rating claim or cite verified provenance in registry.',
+    },
+  ];
+
+  for (const sig of adoptionSignatures) {
+    if (sig.re.test(rawLine) || claim.type === 'adoption') {
+      return {
+        id: `HG-BLOCK-${line}-${Math.abs(hashString(match)) % 10000}`,
+        file,
+        line,
+        rawLine,
+        claim: match,
+        status: 'blocking',
+        severity: 'high',
+        reason: sig.reason,
+        suggestion: sig.suggestion,
+        autoFixable: false,
+      };
+    }
+  }
+
+  // Check 5: Mathematical multipliers matching fixture benchmark
   if (claim.type === 'multiplier') {
     const numericVal = parseFloat(match.replace(/x/i, ''));
     if (
@@ -296,12 +372,18 @@ export function auditFiles(filePaths, registry = defaultRegistry) {
   const allFindings = [];
 
   for (const fp of filePaths) {
-    const fullPath = fp.startsWith(REPO_ROOT) ? fp : join(REPO_ROOT, fp);
+    let fullPath = fp;
+    if (!existsSync(fullPath)) {
+      fullPath = join(REPO_ROOT, fp);
+    }
+    if (!existsSync(fullPath)) {
+      fullPath = join(process.cwd(), fp);
+    }
     if (!existsSync(fullPath)) continue;
 
     const content = readFileSync(fullPath, 'utf-8');
     const relPath = relative(REPO_ROOT, fullPath).replace(/\\/g, '/');
-    const result = auditText(content, relPath, registry);
+    const result = auditText(content, relPath || fp, registry);
     allFindings.push(...result.findings);
   }
 
@@ -402,7 +484,7 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   const args = process.argv.slice(2);
   let outputPath = null;
   let strict = false;
-  let targetFiles = ['README.md', 'submission/devpost.md', 'submission/video-script.md'];
+  let targetFiles = [];
 
   for (let i = 0; i < args.length; i++) {
     if (args[i] === '--output' && args[i + 1]) {
@@ -411,19 +493,34 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
     } else if (args[i] === '--strict') {
       strict = true;
     } else if (args[i] === '--files' && args[i + 1]) {
-      targetFiles = args[i + 1].split(',');
+      targetFiles.push(...args[i + 1].split(','));
       i++;
+    } else if (!args[i].startsWith('--')) {
+      targetFiles.push(args[i]);
     }
   }
 
-  console.log(`🛡️ SponsorFit Honesty Guard: Auditing ${targetFiles.length} files...`);
+  if (targetFiles.length === 0) {
+    targetFiles = ['README.md', 'submission/devpost.md', 'submission/video-script.md'];
+  }
+
+  console.log(`🛡️ SponsorFit Honesty Guard: Auditing ${targetFiles.length} file(s)...`);
   const report = auditFiles(targetFiles);
 
   console.log(
     `Claims summary: Total=${report.summary.totalClaims}, Verified=${report.summary.verified}, ` +
       `AutoFixable=${report.summary.autoFixable}, NeedsHuman=${report.summary.needsHuman}, ` +
-      `Blocking=${report.summary.blocking}`
+      `Blocking=${report.summary.blocking}, Passed=${report.summary.passed}`
   );
+
+  if (!report.summary.passed) {
+    console.log(`Status: ⛔ BLOCKED (passed: false, ${report.summary.blocking} blocking claim(s) detected)`);
+    for (const f of report.findings.filter((f) => f.status === 'blocking')) {
+      console.log(` - [BLOCKING] ${f.file}:${f.line} -> "${f.claim}": ${f.reason}`);
+    }
+  } else {
+    console.log(`Status: ✅ PASSED (passed: true)`);
+  }
 
   if (outputPath) {
     const fullOut = outputPath.startsWith('/') || outputPath.includes(':') ? outputPath : join(REPO_ROOT, outputPath);

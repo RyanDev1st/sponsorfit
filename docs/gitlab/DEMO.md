@@ -120,7 +120,7 @@ cd sponsorfit
 npm test
 
 # 3. Run Honesty Guard unit test suite
-node --test "scripts/guard/*.test.mjs"
+node --test scripts/guard/honesty-guard.test.mjs
 
 # 4. Run CLI static audit on copy files
 node scripts/guard/honesty-guard.mjs --strict --output honesty-report.json

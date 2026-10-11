@@ -36,6 +36,8 @@ test_suite:
     - npm test
     - echo "Executing Honesty Guard internal unit tests..."
     - node --test scripts/guard/honesty-guard.test.mjs
+    - echo "Verifying test counts with CI guard..."
+    - node scripts/check-test-count.mjs
 
 # -----------------------------------------------------------------------------
 # Stage 2: Mathematical Honesty & Provenance Audit

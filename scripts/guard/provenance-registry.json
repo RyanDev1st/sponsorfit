@@ -47,6 +47,42 @@
       "severity": "blocking",
       "reason": "Unverified financial return guarantee violating platform truth in advertising policies.",
       "suggestedFix": "Disclose index score: 'affinity index 1.42x vs candidate set average'."
+    },
+    {
+      "pattern": "\\btrusted\\s+by\\s+(?:(?:~|over|almost|approx\\.?|approximately)\\s+)?(?:\\d[\\d,]*(?:\\.\\d+)?(?:[MBKk])?\\+?|\\d+)",
+      "severity": "blocking",
+      "reason": "Unsourced adoption claim ('trusted by N') without verified platform telemetry or provenance tag.",
+      "suggestedFix": "Remove unsourced adoption figure or cite verified provenance in registry."
+    },
+    {
+      "pattern": "\\b(?:\\d[\\d,]*(?:\\.\\d+)?(?:[MBKk])?)\\+\\s*(?:[a-zA-Z]+\\s+)?(?:users|creators|customers|brands|teams)\\b",
+      "severity": "blocking",
+      "reason": "Unsourced user community scale claim ('N+ users/creators/customers/brands/teams') without documented telemetry or provenance tag.",
+      "suggestedFix": "Remove unsourced community scale figure or cite verified provenance in registry."
+    },
+    {
+      "pattern": "\\bused\\s+by\\s+(?:(?:~|over|almost|approx\\.?|approximately)\\s+)?(?:\\d[\\d,]*(?:\\.\\d+)?(?:[MBKk])?\\+?|\\d+)",
+      "severity": "blocking",
+      "reason": "Unsourced usage adoption claim ('used by N') without verified telemetry or provenance tag.",
+      "suggestedFix": "Remove unsourced usage figure or cite verified provenance in registry."
+    },
+    {
+      "pattern": "\\bjoin\\s+(?:(?:~|over|almost|approx\\.?|approximately)\\s+)?(?:\\d[\\d,]*(?:\\.\\d+)?(?:[MBKk])?\\+?|\\d+)",
+      "severity": "blocking",
+      "reason": "Unsourced user count call-to-action ('join N') without verified registry backing.",
+      "suggestedFix": "Remove unsourced count or cite verified provenance in registry."
+    },
+    {
+      "pattern": "\\b(?:\\d[\\d,]*(?:\\.\\d+)?(?:[MBKk])?\\+?|\\d+)\\s+downloads?\\b",
+      "severity": "blocking",
+      "reason": "Unsourced download count claim ('N downloads') without verified registry backing.",
+      "suggestedFix": "Remove download count or cite verified provenance in registry."
+    },
+    {
+      "pattern": "\\brated\\s+(?:(?:~|over|almost|approx\\.?|approximately)\\s+)?(?:\\d[\\d,]*(?:\\.\\d+)?(?:[MBKk])?\\+?|\\d+)\\s+stars?\\b",
+      "severity": "blocking",
+      "reason": "Unsourced review or star rating social proof ('rated N stars') without verified review source.",
+      "suggestedFix": "Remove star rating claim or cite verified provenance in registry."
     }
   ]
 }
