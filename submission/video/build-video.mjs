@@ -250,7 +250,7 @@ function getProblemCardHtml() {
         <ul>
           <li>Cross-domain affinity mapping via Qloo Taste Graph</li>
           <li>Verifiable response field citations prove exact audience overlap</li>
-          <li>Premium sponsors (Aesop, Oatly, Patagonia) buy cultural alignment</li>
+          <li>Candidate brand alignment evaluated via Qloo Taste Graph affinities</li>
         </ul>
       </div>
     </div>
@@ -641,7 +641,7 @@ async function run() {
     });
     await sleep(800);
 
-    // Pan across Aesop card (#1, 94.2% affinity, A24 influence)
+    // Pan across Aesop card (rank 1, 94.2% sample affinity, A24 influence)
     await moveCursor(600, 200, 500, 320, 30);
     // Pan to field citation badge
     await moveCursor(500, 320, 750, 420, 35);
