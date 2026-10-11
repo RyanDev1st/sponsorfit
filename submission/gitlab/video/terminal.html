@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      width: 1920px;
+      height: 1080px;
+      background: #0B0E14;
+      font-family: 'JetBrains Mono', 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+      color: #E6EDF3;
+      padding: 40px 60px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .window {
+      background: #161B22;
+      border: 1px solid #30363D;
+      border-radius: 12px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.7);
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .titlebar {
+      height: 44px;
+      background: #21262D;
+      border-bottom: 1px solid #30363D;
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      gap: 12px;
+    }
+    .dots { display: flex; gap: 8px; }
+    .dot { width: 12px; height: 12px; border-radius: 50%; }
+    .dot.red { background: #FF5F56; }
+    .dot.yellow { background: #FFBD2E; }
+    .dot.green { background: #27C93F; }
+    .win-title {
+      flex: 1;
+      text-align: center;
+      font-size: 14px;
+      color: #8B949E;
+      font-weight: 500;
+    }
+    .terminal-body {
+      padding: 24px 32px;
+      font-size: 15px;
+      line-height: 1.45;
+      overflow-y: auto;
+      flex: 1;
+    }
+    .prompt {
+      color: #58A6FF;
+      font-weight: 700;
+      margin-top: 12px;
+      margin-bottom: 6px;
+      display: flex;
+      gap: 8px;
+    }
+    .prompt .user { color: #7EE787; }
+    .prompt .path { color: #58A6FF; }
+    .prompt .cmd { color: #F0F6FC; font-weight: 600; }
+    .out {
+      color: #C9D1D9;
+      white-space: pre-wrap;
+      font-size: 14px;
+      line-height: 1.4;
+      margin-bottom: 14px;
+    }
+    .blocked-badge {
+      display: inline-block;
+      background: rgba(248, 81, 73, 0.15);
+      border: 1px solid #F85149;
+      color: #FF7B72;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 6px;
+      margin: 4px 0;
+    }
+    .pass-badge {
+      display: inline-block;
+      background: rgba(63, 185, 80, 0.15);
+      border: 1px solid #3FB950;
+      color: #7EE787;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 6px;
+      margin: 4px 0;
+    }
+    .cursor {
+      display: inline-block;
+      width: 9px;
+      height: 16px;
+      background: #7EE787;
+      vertical-align: middle;
+      animation: blink 1s step-end infinite;
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+  </style>
+</head>
+<body>
+  <div class="window">
+    <div class="titlebar">
+      <div class="dots">
+        <div class="dot red"></div>
+        <div class="dot yellow"></div>
+        <div class="dot green"></div>
+      </div>
+      <div class="win-title">ryan@sponsorfit-runner: ~/sponsorfit (GitLab Transcend Local Verification)</div>
+    </div>
+    <div class="terminal-body">
+      <!-- 1. Honesty Guard Run on Unbacked Claim -->
+      <div class="prompt">
+        <span class="user">ryan@runner</span>:<span class="path">~/sponsorfit</span>$
+        <span class="cmd">node scripts/guard/honesty-guard.mjs docs/gitlab/demo-claim.md</span>
+      </div>
+      <div class="out">🛡️ SponsorFit Honesty Guard: Auditing 1 file(s)...
+Claims summary: Total=1, Verified=0, AutoFixable=0, NeedsHuman=0, Blocking=1, Passed=false
+Status: ⛔ BLOCKED (passed: false, 1 blocking claim(s) detected)
+ - [BLOCKING] temp-demo-claim.md:3 -&gt; &quot;10,000&quot;: Unsourced adoption claim (&#039;trusted by N&#039;) without verified platform telemetry or provenance tag.
+</div>
+      <div class="blocked-badge">⛔ PRE-MERGE ENFORCEMENT: Blocking Claim Detected — Commit / Merge Rejected</div>
+
+      <div style="height: 16px;"></div>
+
+      <!-- 2. Test Suite Run -->
+      <div class="prompt">
+        <span class="user">ryan@runner</span>:<span class="path">~/sponsorfit</span>$
+        <span class="cmd">npm test</span>
+      </div>
+      <div class="out">
+&gt; sponsorfit@0.1.0 test
+&gt; node --test api/agent.test.mjs api/handler.test.mjs api/honesty-audit.test.mjs api/qloo-client.test.mjs api/vercel-adapter.test.mjs &amp;&amp; node --test scripts/guard/honesty-guard.test.mjs
+
+TAP version 13
+# Subtest: SponsorFitAgent: rankBrands deterministically orders by affinity descending
+ok 1 - SponsorFitAgent: rankBrands deterministically orders by affinity descending
+  ---
+  duration_ms: 1.2608
+  type: &#039;test&#039;
+  ...
+# Subtest: SponsorFitAgent: every media kit number traces directly to a Qloo response field
+ok 2 - SponsorFitAgent: every media kit number traces directly to a Qloo response field
+  ---
+  duration_ms: 0.2335
+  type: &#039;test&#039;
+  ...
+# Subtest: SponsorFitAgent: pitches contain explicit field citations and no ungrounded claims
+ok 3 - SponsorFitAgent: pitches contain explicit field citations and no ungrounded claims
+  ---
+  duration_ms: 5.3758
+  type: &#039;test&#039;
+  ...
+# Subtest: SponsorFitAgent: run outputs full 4-step tool trace with latency and outputs
+ok 4 - SponsorFitAgent: run outputs full 4-step tool trace with latency and outputs
+  ---
+  duration_ms: 3.1328
+  type: &#039;test&#039;
+  ...
+# Subtest: handleRequest: GET /api/health returns mock status by default
+ok 5 - handleRequest: GET /api/health returns mock status by default
+  ---
+  duration_ms: 27.3624
+  type: &#039;test&#039;
+  ...
+# Subtest: handleRequest: GET /api/search returns matching entity items
+ok 6 - handleRequest: GET /api/search returns matching entity items
+  ---
+  duration_ms: 2.6443
+  type: &#039;test&#039;
+  ...
+# Subtest: handleRequest: POST /api/audit triggers autonomous workflow and returns media kit
+ok 7 - handleRequest: POST /api/audit triggers autonomous workflow and returns media kit
+  ---
+  duration_ms: 6.8425
+  type: &#039;test&#039;
+  ...
+# Subtest: handleRequest: OPTIONS returns 204 with CORS headers
+ok 8 - handleRequest: OPTIONS returns 204 with CORS headers
+  ---
+  duration_ms: 0.3684
+  type: &#039;test&#039;
+  ...
+# Subtest: Honesty Audit: all sponsor rankings and multipliers trace strictly to mock fixture fields
+ok 9 - Honesty Audit: all sponsor rankings and multipliers trace strictly to mock fixture fields
+  ---
+  duration_ms: 8.1754
+  type: &#039;test&#039;
+  ...
+# Subtest: QlooClient: mock mode detected when QLOO_API_KEY is empty
+ok 10 - QlooClient: mock mode detected when QLOO_API_KEY is empty
+  ---
+  duration_ms: 0.8027
+  type: &#039;test&#039;
+  ...
+# Subtest: QlooClient: live mode enabled when valid API key is supplied
+ok 11 - QlooClient: live mode enabled when valid API key is supplied
+  ---
+  duration_ms: 0.2137
+  type: &#039;test&#039;
+  ...
+# Subtest: QlooClient: mock search returns official Qloo response shape
+ok 12 - QlooClient: mock search returns official Qloo response shape
+  ---
+  duration_ms: 1.8438
+  type: &#039;test&#039;
+  ...
+# Subtest: QlooClient: mock insights returns official brand entities with explainability signals
+ok 13 - QlooClient: mock insights returns official brand entities with explainability signals
+  ---
+  duration_ms: 1.9458
+  type: &#039;test&#039;
+  ...
+# Subtest: QlooClient: live request builds correct base URL, header, and parameters
+ok 14 - QlooClient: live request builds correct base URL, header, and parameters
+  ---
+  duration_ms: 0.5997
+  type: &#039;test&#039;
+  ...
+# Subtest: Vercel Adapter: imports adapter and calls it with a Request for /api/health in mock mode
+ok 15 - Vercel Adapter: imports adapter and calls it with a Request for /api/health in mock mode
+  ---
+  duration_ms: 21.6174
+  type: &#039;test&#039;
+  ...
+# Subtest: Vercel Adapter: routes POST /api/audit through the adapter cleanly
+ok 16 - Vercel Adapter: routes POST /api/audit through the adapter cleanly
+  ---
+  duration_ms: 4.9726
+  type: &#039;test&#039;
+  ...
+1..16
+# tests 16
+# suites 0
+# pass 16
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 165.7006
+TAP version 13
+# Subtest: Honesty Guard: extractClaims extracts percentages, multipliers, and large numbers
+ok 1 - Honesty Guard: extractClaims extracts percentages, multipliers, and large numbers
+  ---
+  duration_ms: 2.2825
+  type: &#039;test&#039;
+  ...
+# Subtest: Honesty Guard: classifyClaim marks baseline technical constants as verified
+ok 2 - Honesty Guard: classifyClaim marks baseline technical constants as verified
+  ---
+  duration_ms: 0.7081
+  type: &#039;test&#039;
+  ...
+# Subtest: Honesty Guard: classifyClaim marks explicit field citations as verified
+ok 3 - Honesty Guard: classifyClaim marks explicit field citations as verified
+  ---
+  duration_ms: 0.1569
+  type: &#039;test&#039;
+  ...
+# Subtest: Honesty Guard: classifyClaim blocks unbacked 500% more engagement claim
+ok 4 - Honesty Guard: classifyClaim blocks unbacked 500% more engagement claim
+  ---
+  duration_ms: 0.3201
+  type: &#039;test&#039;
+  ...
+# Subtest: Honesty Guard: classifyClaim blocks 250M+ exaggeration
+ok 5 - Honesty Guard: classifyClaim blocks 250M+ exaggeration
+  ---
+  duration_ms: 0.2693
+  type: &#039;test&#039;
+  ...
+# Subtest: Honesty Guard: classifyClaim marks multiplier missing citation as auto-fixable
+ok 6 - Honesty Guard: classifyClaim marks multiplier missing citation as auto-fixable
+  ---
+  duration_ms: 1.041
+  type: &#039;test&#039;
+  ...
+# Subtest: Honesty Guard: generateMarkdownMRComment produces structured supervised report
+ok 7 - Honesty Guard: generateMarkdownMRComment produces structured supervised report
+  ---
+  duration_ms: 0.2964
+  type: &#039;test&#039;
+  ...
+# Subtest: Honesty Guard: auditFiles baseline SponsorFit files pass with zero blocking claims
+ok 8 - Honesty Guard: auditFiles baseline SponsorFit files pass with zero blocking claims
+  ---
+  duration_ms: 4.9834
+  type: &#039;test&#039;
+  ...
+# Subtest: Honesty Guard: synthetic MR with unbacked 500% claim fails audit and blocks merge
+ok 9 - Honesty Guard: synthetic MR with unbacked 500% claim fails audit and blocks merge
+  ---
+  duration_ms: 0.4551
+  type: &#039;test&#039;
+  ...
+# Subtest: Honesty Guard: unsourced adoption claim &quot;trusted by 10,000 creators&quot; gives blocking with passed false
+ok 10 - Honesty Guard: unsourced adoption claim &quot;trusted by 10,000 creators&quot; gives blocking with passed false
+  ---
+  duration_ms: 0.5123
+  type: &#039;test&#039;
+  ...
+# Subtest: Honesty Guard: provenance-tagged number still passes audit
+ok 11 - Honesty Guard: provenance-tagged number still passes audit
+  ---
+  duration_ms: 0.1678
+  type: &#039;test&#039;
+  ...
+# Subtest: Honesty Guard: existing technical-baseline number is unaffected
+ok 12 - Honesty Guard: existing technical-baseline number is unaffected
+  ---
+  duration_ms: 0.1037
+  type: &#039;test&#039;
+  ...
+# Subtest: Honesty Guard: covered adoption and social-proof phrases without source are blocking
+ok 13 - Honesty Guard: covered adoption and social-proof phrases without source are blocking
+  ---
+  duration_ms: 0.2695
+  type: &#039;test&#039;
+  ...
+1..13
+# tests 13
+# suites 0
+# pass 13
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 96.9438
+</div>
+      <div class="pass-badge">✅ FULL SUITE PASSED: 16 Core API Tests + 13 Honesty Guard Tests = 29 Total Tests (fail 0)</div>
+
+      <div style="height: 12px;"></div>
+      <div class="prompt">
+        <span class="user">ryan@runner</span>:<span class="path">~/sponsorfit</span>$ <span class="cursor"></span>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,95 @@
+1
+00:00:02,000 --> 00:00:06,787
+Welcome to SponsorFit Honesty Guard, built for GitLab's 'Life After Code' hackathon.
+
+2
+00:00:06,787 --> 00:00:14,310
+In an era where generative AI and autonomous workflows write documentation and copy, unbacked claims can easily slip into codebases.
+
+3
+00:00:14,310 --> 00:00:25,140
+Honesty Guard brings 'Speed with Control' to the GitLab Duo Agent Platform: enabling autonomous provenance auditing while strictly enforcing human authorization before any files are changed.
+
+4
+00:00:25,140 --> 00:00:33,173
+Here on Merge Request !1, a contributor submits new marketing copy adding an unbacked adoption statistic claiming 10,000 creators.
+
+5
+00:00:33,173 --> 00:00:36,015
+Traditional linters pass this without warning.
+
+6
+00:00:36,015 --> 00:00:42,020
+Under our Flow Registry v1 workflow, Honesty Guard inspects the merge request diff automatically.
+
+7
+00:00:42,020 --> 00:00:47,569
+Notice what happens next: the agent does not unilaterally modify files or force a merge.
+
+8
+00:00:47,569 --> 00:00:55,892
+Instead, it posts structured findings note 3991403634 to the discussion, classifying the unsourced 10,000 creator claim as blocking.
+
+9
+00:00:55,892 --> 00:01:05,982
+The agent proposes an honest nonnumeric replacement, marked explicitly NOT applied: 'SponsorFit helps creators prepare culturally grounded sponsorship pitches.'
+
+10
+00:01:05,982 --> 00:01:13,423
+The flow cleanly pauses at the HumanInputComponent gate in status INPUT_REQUIRED, awaiting human maintainer direction.
+
+11
+00:01:13,423 --> 00:01:20,989
+Because the raw agent session requires maintainer login, the paused gate is verified directly here in the audit comment.
+
+12
+00:01:20,989 --> 00:01:24,780
+Here is the flow specification in honesty-guard.yaml on GitLab.
+
+13
+00:01:24,780 --> 00:01:29,233
+Here we see the maintainer-approval step defined as a HumanInputComponent.
+
+14
+00:01:29,233 --> 00:01:38,499
+Execution pauses and branches based on human maintainer direction: approve routes to the remediator, modify loops back, and reject halts the flow cleanly.
+
+15
+00:01:38,499 --> 00:01:42,049
+Autonomous speed is coupled with strict supervised control.
+
+16
+00:01:42,049 --> 00:01:47,607
+Here on GitLab CI Pipeline 2936135503, all four stages are completely green:
+
+17
+00:01:47,607 --> 00:01:55,211
+The test suite, the honesty audit, the single-page app build, and the zero-cost GitLab Pages deployment.
+
+18
+00:01:55,211 --> 00:01:59,159
+Every commit and merge request is verified end-to-end.
+
+19
+00:01:59,159 --> 00:02:01,465
+We also verify Honesty Guard locally.
+
+20
+00:02:01,465 --> 00:02:11,869
+Running honesty-guard.mjs against the unsourced marketing claim gives status BLOCKED with passed false, catching the unbacked 10,000 creator claim before it can merge.
+
+21
+00:02:11,869 --> 00:02:18,099
+Running npm test confirms all 16 core API tests and all 13 honesty guard tests pass with 0 failures.
+
+22
+00:02:18,099 --> 00:02:25,406
+With all tests passing and pipelines green, SponsorFit Honesty Guard proves that in the age of autonomous development,
+
+23
+00:02:25,406 --> 00:02:29,927
+Teams can achieve speed with control using the GitLab Duo Agent Platform.
+
+24
+00:02:29,927 --> 00:02:34,199
+Open source under the MIT license, with zero ongoing cost. Thank you!
