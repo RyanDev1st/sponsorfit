@@ -76,4 +76,4 @@
 - **Voiceover:**
   > *"SponsorFit is open-source under MIT, tested with 16 automated tests, and prepped for zero-cost deployment on Vercel Hobby.
   > Built from scratch for the Qloo Agentic Hackathon: because AI agents should have taste."*
-- **On Screen:** Closing title slide: **SponsorFit — Cultural Intelligence for Creator Sponsorships**. Links: `github.com/RyanDev1st/sponsorfit` â€¢ `sponsorfit.vercel.app`.
+- **On Screen:** Closing title slide: **SponsorFit — Cultural Intelligence for Creator Sponsorships**. Links: `github.com/RyanDev1st/sponsorfit` • `sponsorfit.vercel.app`.
