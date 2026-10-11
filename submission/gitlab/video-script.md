@@ -1,6 +1,6 @@
 # SponsorFit Honesty Guard: Video Demonstration Script
 
-> **Hackathon Track:** GitLab "Transcend: Life After Code" â€” Path B: Best Supervised Agent ([Rules](https://gitlab-transcend.devpost.com/rules))
+> **Hackathon Track:** GitLab "Transcend: Life After Code" — Path B: Best Supervised Agent ([Rules](https://gitlab-transcend.devpost.com/rules))
 > **Target Video Duration:** 2 minutes 35 seconds (Strict requirement: â‰¤ 2:45)
 > **Pacing:** ~140 words per minute (~360 words total)
 > **Demonstration Focus:** Real captured GitLab Duo session 9292188 on Merge Request !1
@@ -9,7 +9,7 @@
 
 ### Shot List & Timestamped Narration
 
-#### 0:00 â€“ 0:25 | Act 1: The Problem â€” AI Hallucination & The Need for Supervised Control
+#### 0:00 – 0:25 | Act 1: The Problem — AI Hallucination & The Need for Supervised Control
 - **On Screen:** Split screen showing the GitLab repository and architecture diagram of the Flow Registry v1 state machine.
 - **Visual Action:** Highlight the transition from autonomous analysis to the `HumanInputComponent` gate.
 - **Voiceover:**
@@ -19,7 +19,7 @@
 
 ---
 
-#### 0:25 â€“ 0:50 | Act 2: The Merge Request & Automated Duo Trigger
+#### 0:25 – 0:50 | Act 2: The Merge Request & Automated Duo Trigger
 - **On Screen:** Navigate to Merge Request !1 on GitLab: `demo/honesty-guard-unsourced-claim`.
 - **Visual Action:** Open the MR Changes tab, showing the addition of ungrounded test copy in `docs/gitlab/demo-claim.md` claiming unverified adoption by 10,000 creators.
 - **Voiceover:**
@@ -29,9 +29,9 @@
 
 ---
 
-#### 0:50 â€“ 1:20 | Act 3: Autonomous Duo Audit & Defect Detection
+#### 0:50 – 1:20 | Act 3: Autonomous Duo Audit & Defect Detection
 - **On Screen:** Open the GitLab Duo Agent execution view for session 9292188.
-- **Visual Action:** Scroll through execution steps showing `honitor_auditor` and `claim_classifier` inspecting the MR diff against `scripts/guard/provenance-registry.json`.
+- **Visual Action:** Scroll through execution steps showing `honesty_auditor` and `claim_classifier` inspecting the MR diff against `scripts/guard/provenance-registry.json`.
 - **Voiceover:**
   > *"Under the hood, the flow executes the honesty auditor agent.
   > The agent scans the diff against our provenance registry.
@@ -40,7 +40,7 @@
 
 ---
 
-#### 1:20 â€“ 1:50 | Act 4: The Findings Comment & Paused Human Gate (INPUT_REQUIRED)
+#### 1:20 – 1:50 | Act 4: The Findings Comment & Paused Human Gate (INPUT_REQUIRED)
 - **On Screen:** Switch to the MR discussion tab displaying findings note 3991403634. Then switch to Session 9292188 showing status **`INPUT_REQUIRED`**.
 - **Visual Action:** Zoom in on note 3991403634 detailing the findings and proposed honest replacement: *"SponsorFit helps creators prepare culturally grounded sponsorship pitches."* Zoom in on the session status badge `INPUT_REQUIRED`.
 - **Voiceover:**
@@ -50,7 +50,7 @@
 
 ---
 
-#### 1:50 â€“ 2:15 | Act 5: Supervised Human Decision & Local Guard Verification
+#### 1:50 – 2:15 | Act 5: Supervised Human Decision & Local Guard Verification
 - **On Screen:** Maintainer review interface showing the prompt with Approve, Modify, and Reject choices. Split screen to terminal running `npm test`.
 - **Visual Action:** Maintainer reviews the proposed replacement. Terminal runs `npm test`, showing 16 core API tests passing and honesty guard tests passing.
 - **Voiceover:**
@@ -60,7 +60,7 @@
 
 ---
 
-#### 2:15 â€“ 2:35 | Act 6: CI/CD Pipeline & Conclusion
+#### 2:15 – 2:35 | Act 6: CI/CD Pipeline & Conclusion
 - **On Screen:** GitLab CI Pipeline graph (pipeline 2934942327 and 2934945967) showing green test and audit stages. Conclude on GitLab repo homepage.
 - **Visual Action:** Hover over green pipeline badges and MIT license in the repository.
 - **Voiceover:**
