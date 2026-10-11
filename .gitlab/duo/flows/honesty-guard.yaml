@@ -43,7 +43,7 @@ components:
 
   # Step 2: Classification Step
   # AI Task agent that parses raw audit evidence and classifies findings into auto-fixable,
-  # needs-human, and blocking using a strict JSON response schema.
+  # needs-human, and blocking in a Markdown review report.
   - name: "claim_classifier"
     type: "AgentComponent"
     prompt_id: "classify_claims_prompt"
