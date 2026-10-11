@@ -4,6 +4,7 @@
 - GitHub origin: https://github.com/RyanDev1st/sponsorfit (preserved).
 - Demo MR: https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43238005/sponsorfit/-/merge_requests/1
 - Fixture commit: `d4551c11c7af61873a7f54cce29de47e0d3e16d5`, on `demo/honesty-guard-unsourced-claim`, mirrored to both hosts. The false adoption claim is clearly labelled and stays on the unmerged demo branch.
+- Setup commit: `ddbbaa290d312896931b3966242ec20282ef6838`, pushed to `main` and `task/g3-gitlab-entry` on GitHub and GitLab; both remote main hashes were independently checked and match. Local edits stay on the separate task branch.
 - Catalog: https://gitlab.com/explore/ai-catalog/flows/1016557 — enabled, release 1.0.1, consumer 12500616. Custom flow agents are created by the flow, so registering a separate standalone agent is unnecessary.
 - Active Mention/Assign/Assign reviewer trigger: 3014322; MR / Created trigger: 3014324.
 - Real invocation note: https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43238005/sponsorfit/-/merge_requests/1#note_3991401730
@@ -14,6 +15,10 @@
 ## Verification
 
 Local `npm test`: 16 passed, 0 failed. Guard tests: 9 passed, 0 failed. `npm run build` succeeded. The revised YAML passed the local downloaded Flow Registry v1 JSON schema and GitLab's live AI Catalog validator; the live validator rejected optional fields accepted by the local copy, so only supported core fields remain.
+
+Staged-diff credential-pattern grep returned **EMPTY**; an exact in-memory comparison against the PAT also returned **EMPTY**. No token was printed, persisted in a remote URL, or written to another file. `git diff --cached --check` passed. The baseline strict claim audit exited successfully with zero blocking findings, while still reporting claims that need human review.
+
+The [actual agent workload pipeline](https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43238005/sponsorfit/-/pipelines/2934942327) completed successfully. The main application pipeline after the Node fix is [2934945967](https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43238005/sponsorfit/-/pipelines/2934945967); its final state must be checked before final submission.
 
 GitLab's first core pipeline failed because Node 20 did not expand the quoted test glob. Fixed npm test to enumerate the existing API tests, the guard command to use its explicit file, and the CI image to Node 24. The captured agent independently used explicit-path fallbacks and reported real 16/16 and 9/9 results. Local copies of third-party specs remain ignored; none are staged or redistributed.
 
