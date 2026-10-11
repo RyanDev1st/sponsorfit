@@ -17,9 +17,6 @@
 
 version: "v1"
 environment: ambient
-name: "sponsorfit-honesty-guard"
-description: "Supervised GitLab Duo flow auditing numeric claims, enforcing mathematical provenance, and gating MR merges for SponsorFit."
-product_group: "code_review"
 
 flow:
   entry_point: "honesty_auditor"
@@ -33,6 +30,7 @@ components:
     prompt_id: "audit_claims_prompt"
     inputs:
       - "context:goal"
+      - "context:project_id"
     toolset:
       - "run_command"
       - "read_file"
@@ -49,11 +47,13 @@ components:
   - name: "claim_classifier"
     type: "AgentComponent"
     prompt_id: "classify_claims_prompt"
-    response_schema_id: "claim_classification_schema"
     inputs:
       - from: "context:honesty_auditor.final_answer"
         as: "audit_evidence"
-    toolset: []
+      - "context:goal"
+      - "context:project_id"
+    toolset:
+      - "create_merge_request_note"
     ui_log_events:
       - "on_agent_final_answer"
     ui_role_as: "agent"
@@ -63,16 +63,12 @@ components:
   # breakdown to the human maintainer waiting for approval or rejection.
   - name: "maintainer_approval"
     type: "HumanInputComponent"
-    sends_response_to: "fix_remediator"
+    sends_response_to: "claim_classifier"
     interaction_type: "approval"
-    message_template: "Honesty Guard Audit Findings:\n{{ summary }}\n\nDetailed Breakdown:\n{{ findings }}\n\nProposed Remediations:\n{{ proposed_fixes }}\n\nPlease review and approve applying the proposed fixes to this Merge Request."
+    message_template: "Honesty Guard Audit Findings:\n{{ findings }}\n\nPlease review the findings and exact proposed fixes, then approve, modify, or reject. No edits have been applied."
     inputs:
-      - from: "context:claim_classifier.final_answer.summary"
-        as: "summary"
-      - from: "context:claim_classifier.final_answer.findings_table"
+      - from: "context:claim_classifier.final_answer"
         as: "findings"
-      - from: "context:claim_classifier.final_answer.proposed_fixes"
-        as: "proposed_fixes"
     ui_log_events:
       - "on_user_input_prompt"
       - "on_user_response"
@@ -86,10 +82,10 @@ components:
     inputs:
       - from: "context:maintainer_approval.approval"
         as: "approval_decision"
-      - from: "context:claim_classifier.final_answer.proposed_fixes"
+      - from: "context:claim_classifier.final_answer"
         as: "approved_fixes"
-      - from: "context:claim_classifier.final_answer.findings_table"
-        as: "findings_table"
+      - "context:goal"
+      - "context:project_id"
     toolset:
       - "edit_file"
       - "create_merge_request_note"
@@ -109,66 +105,36 @@ routers:
       input: "context:maintainer_approval.approval"
       routes:
         "approve": "fix_remediator"
-        "reject": "abort"
-        "default_route": "abort"
+        "modify": "claim_classifier"
+        "reject": "end"
+        "default_route": "end"
   - from: "fix_remediator"
     to: "end"
-
-response_schemas:
-  - schema_id: "claim_classification_schema"
-    definition:
-      $schema: "http://json-schema.org/draft-07/schema#"
-      title: "claim_classification_response"
-      type: "object"
-      properties:
-        overall_status:
-          type: "string"
-          enum: ["passed", "blocked", "needs_review"]
-        summary:
-          type: "string"
-          description: "Summary of numeric claims evaluated"
-        blocking_count:
-          type: "integer"
-          minimum: 0
-        auto_fixable_count:
-          type: "integer"
-          minimum: 0
-        needs_human_count:
-          type: "integer"
-          minimum: 0
-        findings_table:
-          type: "string"
-          description: "Markdown table of categorized findings"
-        proposed_fixes:
-          type: "string"
-          description: "Exact text replacements and derivation tags to apply"
-      required:
-        - "overall_status"
-        - "summary"
-        - "blocking_count"
-        - "auto_fixable_count"
-        - "findings_table"
-        - "proposed_fixes"
 
 prompts:
   - prompt_id: "audit_claims_prompt"
     name: "Claim Audit Prompt"
-    unit_primitives:
-      - "duo_agent_platform"
+    unit_primitives: []
     prompt_template:
       system: |
         You are the SponsorFit Honesty Guard Auditor.
         Your job is to inspect git diffs, run the mathematical provenance test suite via run_command,
         read the generated honesty-report.json via read_file, and return full findings.
+        Fetch the MR and inspect every changed copy or Markdown file, including deliberately labelled
+        test fixtures. Run npm test and node --test scripts/guard/honesty-guard.test.mjs; then run
+        node scripts/guard/honesty-guard.mjs --files <comma-separated changed Markdown files> --output honesty-report.json.
+        Audit numbers in the MR independently as well: citation tags alone do not prove truth.
+        Do not edit files, commit, merge, approve the MR, or invent evidence.
       user: |
+        Project ID: {{project_id}}
         Execute honesty audit for merge request: {{goal}}
+      placeholder: history
     params:
       timeout: 180
 
   - prompt_id: "classify_claims_prompt"
     name: "Claim Classification Prompt"
-    unit_primitives:
-      - "duo_agent_platform"
+    unit_primitives: []
     prompt_template:
       system: |
         You are the SponsorFit Claim Classifier.
@@ -176,26 +142,35 @@ prompts:
         - auto-fixable: Missing standard citation tags ([derived: affinity / mean(sample)]).
         - needs-human: Contextual metrics requiring maintainer confirmation.
         - blocking: Unbacked marketing percentages (e.g. '500% more engagement') or ungrounded claims.
-        Structure your answer according to the claim_classification_schema response schema.
+        Post one MR note with the findings, exact proposed replacement, and the explicit statement
+        that no fix has been applied and human approval is required. Do not fabricate a source.
+        For unsupported adoption statistics, remove the number and describe what SponsorFit does.
+        Do not approve or merge the MR. Then return the structured findings.
+        Return a Markdown summary, categorized findings table, and exact proposed text replacements.
       user: |
+        Project ID: {{project_id}}
+        Merge request: {{goal}}
         Here are the audit findings to classify:
         {{audit_evidence}}
+      placeholder: history
     params:
       timeout: 180
 
   - prompt_id: "apply_fixes_prompt"
     name: "Apply Approved Fixes Prompt"
-    unit_primitives:
-      - "duo_agent_platform"
+    unit_primitives: []
     prompt_template:
       system: |
         You are the SponsorFit Supervised Remediator.
         Check the maintainer approval decision. If approved, apply the approved fixes using edit_file
         and leave a summary comment on the Merge Request using create_merge_request_note.
         If not approved, take no mutating actions.
+        Never merge or approve the MR. Report any inability to persist the edit truthfully.
       user: |
+        Project ID: {{project_id}}
+        Merge request: {{goal}}
         Approval decision: {{approval_decision}}
         Approved fixes: {{approved_fixes}}
-        Findings table: {{findings_table}}
+      placeholder: history
     params:
       timeout: 180

@@ -16,7 +16,7 @@ stages:
   - deploy
 
 default:
-  image: node:20-alpine
+  image: node:24-alpine
   cache:
     key:
       files:
@@ -35,7 +35,7 @@ test_suite:
     - echo "Executing core SponsorFit test suite..."
     - npm test
     - echo "Executing Honesty Guard internal unit tests..."
-    - node --test "scripts/guard/*.test.mjs"
+    - node --test scripts/guard/honesty-guard.test.mjs
 
 # -----------------------------------------------------------------------------
 # Stage 2: Mathematical Honesty & Provenance Audit
