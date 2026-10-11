@@ -174,3 +174,61 @@ test('Honesty Guard: synthetic MR with unbacked 500% claim fails audit and block
   assert.equal(report.summary.blocking, 1);
   assert.equal(report.findings.find((f) => f.claim === '500%').status, 'blocking');
 });
+
+test('Honesty Guard: unsourced adoption claim "trusted by 10,000 creators" gives blocking with passed false', () => {
+  const content = 'SponsorFit is trusted by 10,000 creators worldwide.';
+  const report = auditText(content, 'test-trusted-by.md');
+  assert.equal(report.summary.passed, false, 'Expected audit to fail with passed: false');
+  assert.equal(report.summary.blocking, 1, 'Expected exactly 1 blocking claim');
+  const finding = report.findings.find((f) => f.claim === '10,000');
+  assert.ok(finding, 'Must extract claim for 10,000');
+  assert.equal(finding.status, 'blocking');
+  assert.equal(finding.severity, 'high');
+});
+
+test('Honesty Guard: provenance-tagged number still passes audit', () => {
+  const content = 'SponsorFit is trusted by 10,000 creators [field: results.entities[0].name].';
+  const report = auditText(content, 'test-trusted-by-cited.md');
+  assert.equal(report.summary.passed, true, 'Expected cited claim to pass with passed: true');
+  assert.equal(report.summary.blocking, 0, 'Expected 0 blocking claims');
+  assert.equal(report.findings[0].status, 'verified');
+  assert.equal(report.findings[0].severity, 'none');
+});
+
+test('Honesty Guard: existing technical-baseline number is unaffected', () => {
+  const content = 'Audience: 35,000 monthly listeners.';
+  const report = auditText(content, 'test-baseline.md');
+  assert.equal(report.summary.passed, true, 'Expected baseline constants to pass with passed: true');
+  assert.equal(report.summary.blocking, 0, 'Expected 0 blocking claims');
+  assert.equal(report.summary.verified, 1, 'Expected baseline constant to be verified');
+  assert.equal(report.findings[0].claim, '35,000');
+  assert.equal(report.findings[0].status, 'verified');
+});
+
+test('Honesty Guard: covered adoption and social-proof phrases without source are blocking', () => {
+  const testPhrases = [
+    { text: 'Join 10,000+ creators today.', expectedNum: '10,000' },
+    { text: 'SponsorFit is used by 5,000 creators across podcasting.', expectedNum: '5,000' },
+    { text: 'Join 20,000 brands optimizing sponsorships.', expectedNum: '20,000' },
+    { text: 'Over 100,000 downloads since launch.', expectedNum: '100,000' },
+    { text: 'Rated 5 stars on Product Hunt.', expectedNum: '5' },
+    { text: 'Rated 4.9 stars by creators.', expectedNum: '4.9' },
+  ];
+
+  for (const { text, expectedNum } of testPhrases) {
+    const report = auditText(text, 'test-social-proof.md');
+    assert.equal(
+      report.summary.passed,
+      false,
+      `Expected "${text}" to fail audit with passed: false`
+    );
+    assert.ok(
+      report.summary.blocking >= 1,
+      `Expected "${text}" to have at least 1 blocking claim`
+    );
+    const finding = report.findings.find((f) => f.claim === expectedNum);
+    assert.ok(finding, `Must extract claim "${expectedNum}" from "${text}"`);
+    assert.equal(finding.status, 'blocking');
+  }
+});
+

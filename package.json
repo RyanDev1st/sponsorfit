@@ -8,7 +8,8 @@
     "server": "node api/server.mjs",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "test": "node --test api/agent.test.mjs api/handler.test.mjs api/honesty-audit.test.mjs api/qloo-client.test.mjs api/vercel-adapter.test.mjs",
+    "test": "node --test api/agent.test.mjs api/handler.test.mjs api/honesty-audit.test.mjs api/qloo-client.test.mjs api/vercel-adapter.test.mjs && node --test scripts/guard/honesty-guard.test.mjs",
+    "test:guard": "node --test scripts/guard/honesty-guard.test.mjs",
     "video": "node submission/video/build-video.mjs"
   },
   "dependencies": {
