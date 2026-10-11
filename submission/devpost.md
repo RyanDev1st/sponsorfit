@@ -18,7 +18,7 @@
 ## 2. Devpost Submission Fields
 
 ### Inspiration
-Independent creatorsâ€”newsletter writers, boutique podcasters, and essayistsâ€”face significant hurdles when pitching prospective sponsors. When seeking brand partnerships, creators are commonly restricted to blunt demographic summaries: *"We reach 35,000 monthly listeners aged 25â€“40"* (as illustrated in our demo sample preset).
+Independent creators—newsletter writers, boutique podcasters, and essayists—face significant hurdles when pitching prospective sponsors. When seeking brand partnerships, creators are commonly restricted to blunt demographic summaries: *"We reach 35,000 monthly listeners aged 25–40"* (as illustrated in our demo sample preset).
 
 This commoditizes creators, forcing them to compete directly against programmatic ad networks on CPM price. Meanwhile, brand sponsorship outreach often demands authentic cultural resonance, yet creators lack transparent, data-driven tools to demonstrate shared audience affinities.
 
@@ -29,11 +29,11 @@ We built SponsorFit to explore replacing flat demographics with cultural taste. 
 ### What It Does
 SponsorFit is a cultural intelligence agent that turns audience taste into quantifiable, pitch-ready sponsor partnerships:
 
-1. **Audience Seed Grounding:** Creators enter 3â€“5 cultural anchors their audience loves (e.g., A24, Phoebe Bridgers, Severance, Tartine Bakery).
+1. **Audience Seed Grounding:** Creators enter 3–5 cultural anchors their audience loves (e.g., A24, Phoebe Bridgers, Severance, Tartine Bakery).
 2. **Canonical Entity Resolution:** Queries Qloo `/search` to resolve input keywords into canonical cultural URNs across cinema, music, dining, and brands.
 3. **Taste Graph Traversal:** Ingests high-affinity candidate brands and explainability signals via Qloo `/v2/insights`.
 4. **Deterministic Ranking Engine:** Ranks sponsor candidates by affinity scores and computes relative multipliers against candidate sample averages ($A_i / \bar{A}$).
-5. **Grounded Cultural Media Kit:** Synthesizes a one-page media kit and tailored cold outreach pitch letters where **every single statistic links directly to an underlying Qloo response field**â€”eliminating hallucination.
+5. **Grounded Cultural Media Kit:** Synthesizes a one-page media kit and tailored cold outreach pitch letters where **every single statistic links directly to an underlying Qloo response field**—eliminating hallucination.
 6. **One-Click Export:** Download the generated Media Kit as Markdown and copy personalized pitch emails with a single click.
 
 ---
@@ -49,7 +49,7 @@ We designed SponsorFit from scratch with a focus on mathematical grounding, spee
 ---
 
 ### Challenges We Ran Into
-1. **Zero-Hallucination Enforcement:** LLMs tend to embellish partnership pitches with unverified statistics (for example, inventing unbacked comparative claims or unsubstantiated percentages). We solved this by implementing a deterministic template synthesizer and strict provenance tracking: every pitch explicitly cites underlying Qloo fields (`results.entities[i].affinity` and `query.explainability.signals`).
+1. **Provenance Enforcement:** LLMs tend to embellish partnership pitches with unverified statistics (for example, inventing unbacked comparative claims or unsubstantiated percentages). We solved this by implementing a deterministic template synthesizer and strict provenance tracking: every pitch explicitly cites underlying Qloo fields (`results.entities[i].affinity` and `query.explainability.signals`).
 2. **Above-the-Fold Demo Polish:** Initial testing showed results starting below the fold on 1440x900 screens. We engineered a responsive view switcher with a collapsible summary bar so judges see ranked sponsors immediately without excessive scrolling.
 3. **Free Tier Hosting Compatibility:** We architected the API to be framework-neutral using pure standard `fetch` and Web Standard `Request`/`Response`, allowing zero-cost deployment on Vercel Hobby or Cloudflare Workers with $0 budget.
 
@@ -57,7 +57,7 @@ We designed SponsorFit from scratch with a focus on mathematical grounding, spee
 
 ### Accomplishments That We're Proud Of
 - **16 of 16 Tests Passing:** Complete automated test suite covering live request building, mock fallback, ranking math, honesty provenance, and Vercel serverless adapters (computed by `npm test`).
-- **Deterministic Field Provenance:** Pitch letters don't just recommend sponsorsâ€”they prove why with exact field citations (`results.entities[0].affinity = 0.942`). In mock mode, candidate entities (such as sample entities Aesop and Oatly) are evaluated strictly against sample mock fixtures; in live mode, candidates reflect live Qloo Taste Graph API query responses.
+- **Deterministic Field Provenance:** Pitch letters don't just recommend sponsors—they prove why with exact field citations (`results.entities[0].affinity = 0.942`). In mock mode, candidate entities (such as sample entities Aesop and Oatly) are evaluated strictly against sample mock fixtures; in live mode, candidates reflect live Qloo Taste Graph API query responses.
 - **Demo-Quality UI:** Editorial, warm aesthetic crafted specifically for human judges and creators, verified headless via Edge CDP automation with zero console errors.
 
 ---

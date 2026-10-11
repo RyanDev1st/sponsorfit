@@ -1,7 +1,7 @@
 # Devpost Submission: SponsorFit Honesty Guard
 
 > **Hackathon:** GitLab "Transcend: Life After Code" Hackathon ([Overview](https://gitlab-transcend.devpost.com/), [Rules](https://gitlab-transcend.devpost.com/rules))
-> **Target Category:** Path B (Bring Your Own Code) â€” **Best Supervised Agent**
+> **Target Category:** Path B (Bring Your Own Code) — **Best Supervised Agent**
 > **License:** MIT License (`Copyright (c) 2026 SponsorFit contributors`)
 
 ---
@@ -26,7 +26,7 @@ As generative AI accelerates software development into the "Life After Code" era
 
 Unchecked autonomous agents that push code or documentation without human verification can introduce legal exposure, reputational damage, and degraded software quality. We asked: *How do we give development teams autonomous speed while strictly preserving human governance?*
 
-We created **SponsorFit Honesty Guard**â€”a supervised GitLab Duo workflow built on the **Flow Registry v1** standard. Honesty Guard demonstrates the philosophy of **"Speed with Control"**: letting autonomous agents discover claims, run provenance audits, and identify repository defects, while strictly halting execution at a human authorization checkpoint before modifying files or merging changes.
+We created **SponsorFit Honesty Guard**—a supervised GitLab Duo workflow built on the **Flow Registry v1** standard. Honesty Guard demonstrates the philosophy of **"Speed with Control"**: letting autonomous agents discover claims, run provenance audits, and identify repository defects, while strictly halting execution at a human authorization checkpoint before modifying files or merging changes.
 
 ---
 
@@ -63,7 +63,7 @@ We integrated SponsorFit with the GitLab Duo Agent Platform under Path B (Bring 
 
 ### Accomplishments That We're Proud Of
 - **Real Paused Duo Session on MR !1:** In a live demonstration on [MR !1](https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43238005/sponsorfit/-/merge_requests/1) (fixture commit `d4551c11c7af61873a7f54cce29de47e0d3e16d5` on branch `demo/honesty-guard-unsourced-claim`), Duo agent session 9292188 caught the ungrounded creator adoption claim in `docs/gitlab/demo-claim.md`, published a structured findings note, proposed an honest nonnumeric alternative, and cleanly halted at **`INPUT_REQUIRED`**.
-- **Human Authority Preserved:** The agent took zero mutating actions without authorizationâ€”no files were modified and no merge was forced, proving the viability of supervised agent governance.
+- **Human Authority Preserved:** The agent took zero mutating actions without authorization—no files were modified and no merge was forced, proving the viability of supervised agent governance.
 - **Real Defects Surfaced & Resolved:** The workflow surfaced genuine runner glob issues during execution, which were resolved and verified across both GitHub origin and GitLab main branches.
 - **Complete Automated Verification:** 16 core test cases (`npm test`) and full honesty guard unit tests pass cleanly in local environments and CI runners.
 - **Credential Hygiene:** Staged diff scans and in-memory Personal Access Token checks verified zero tokens or sensitive credentials were committed or exposed.
