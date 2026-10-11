@@ -1,14 +1,14 @@
 1
 00:00:02,000 --> 00:00:10,000
-Every month, thousands of talented newsletter writers and indie podcasters pitch brands for sponsorships using the exact same generic stats: follower counts and age demographics.
+When independent newsletter writers and indie podcasters pitch potential sponsors, they are often limited to generic demographic stats: follower counts and age demographics.
 
 2
 00:00:10,000 --> 00:00:18,500
-But premium brands like Aesop, Oatly, and Patagonia don't buy demographics, they buy authentic cultural alignment.
+But sponsorship conversations require authentic audience alignment.
 
 3
 00:00:18,500 --> 00:00:27,240
-Welcome to SponsorFit: the autonomous agent that turns audience cultural taste into quantifiable brand partnerships using Qloo's Taste Graph.
+Welcome to SponsorFit: the agentic tool that turns audience cultural taste into structured sponsor insights using Qloo's Taste Graph.
 
 4
 00:00:27,240 --> 00:00:35,500
@@ -36,7 +36,7 @@ Notice how our collapsed summary keeps all ranked sponsors above the fold.
 
 10
 00:01:16,000 --> 00:01:24,000
-In this sample dataset, the engine surfaces benchmarked brand matches: Aesop shows a sample affinity of ninety-four percent, thirty-two percent above the sample mean, driven by audience interest in A24 films.
+In this mock mode demonstration, the engine ranks sample brand entities: Aesop shows a sample affinity score of ninety-four percent, thirty-two percent above the sample mean, driven by sample interest in A24 films.
 
 11
 00:01:24,000 --> 00:01:32,010
@@ -48,7 +48,7 @@ SponsorFit generates a publication-ready Cultural Media Kit. In one click, creat
 
 13
 00:01:39,500 --> 00:01:47,110
-You're no longer begging for ad reads, you're presenting empirical consumer preference data.
+You're no longer presenting unbacked claims, you're presenting empirical consumer preference data.
 
 14
 00:01:47,110 --> 00:01:56,500
@@ -56,11 +56,11 @@ Switching to pitch letters, SponsorFit formats personalized cold outreach emails
 
 15
 00:01:56,500 --> 00:02:06,420
-Notice the difference: every claim cites verifiable Qloo API response fields, proving to the brand's partnership team why this audience over-indexes on their products. One click copies the pitch ready for your email client.
+Notice the difference: every claim cites verifiable Qloo API response fields, providing transparent data for outreach proposals. One click copies the pitch ready for your email client.
 
 16
 00:02:06,420 --> 00:02:14,000
-SponsorFit is open-source under MIT, tested with 16 automated test suites, and prepped for zero-cost deployment on Vercel Hobby.
+SponsorFit is open-source under MIT, tested with 16 automated tests, and prepped for zero-cost deployment on Vercel Hobby.
 
 17
 00:02:14,000 --> 00:02:21,090

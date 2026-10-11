@@ -43,7 +43,7 @@ if (Test-Path $scriptPath) {
         [PSCustomObject]@{
             id = "shot_01_hook"
             name = "Shot 1: The Hook & Creator Monetization Problem"
-            text = "Every month, thousands of talented newsletter writers and indie podcasters pitch brands for sponsorships using the exact same generic stats: follower counts and age demographics. But premium brands like Aesop, Oatly, and Patagonia don't buy demographics, they buy authentic cultural alignment. Welcome to SponsorFit: the autonomous agent that turns audience cultural taste into quantifiable brand partnerships using Qloo's Taste Graph."
+            text = "When independent newsletter writers and indie podcasters pitch potential sponsors, they are often limited to generic demographic stats: follower counts and age demographics. But sponsorship conversations require authentic audience alignment. Welcome to SponsorFit: the agentic tool that turns audience cultural taste into structured sponsor insights using Qloo's Taste Graph."
         },
         [PSCustomObject]@{
             id = "shot_02_seeds"
@@ -58,22 +58,22 @@ if (Test-Path $scriptPath) {
         [PSCustomObject]@{
             id = "shot_04_ranked"
             name = "Shot 4: Ranked Sponsor Fit Tiers"
-            text = "Notice how our collapsed summary keeps all ranked sponsors above the fold. In this sample dataset, the engine surfaces benchmarked brand matches: Aesop shows a sample affinity of ninety-four percent, thirty-two percent above the sample mean, driven by audience interest in A24 films. In live mode with a provisioned API key, SponsorFit queries Qloo's live Taste Graph with identical transparent field citations."
+            text = "Notice how our collapsed summary keeps all ranked sponsors above the fold. In this mock mode demonstration, the engine ranks sample brand entities: Aesop shows a sample affinity score of ninety-four percent, thirty-two percent above the sample mean, driven by sample interest in A24 films. In live mode with a provisioned API key, SponsorFit queries Qloo's live Taste Graph with identical transparent field citations."
         },
         [PSCustomObject]@{
             id = "shot_05_mediakit"
             name = "Shot 5: One-Page Cultural Media Kit"
-            text = "SponsorFit generates a publication-ready Cultural Media Kit. In one click, creators can download a clean Markdown dossier backed by zero-hallucination data. You're no longer begging for ad reads, you're presenting empirical consumer preference data."
+            text = "SponsorFit generates a publication-ready Cultural Media Kit. In one click, creators can download a clean Markdown dossier backed by zero-hallucination data. You're no longer presenting unbacked claims, you're presenting empirical consumer preference data."
         },
         [PSCustomObject]@{
             id = "shot_06_pitch"
             name = "Shot 6: Grounded Sponsor Pitch Letters"
-            text = "Switching to pitch letters, SponsorFit formats personalized cold outreach emails using this sample audit data. Notice the difference: every claim cites verifiable Qloo API response fields, proving to the brand's partnership team why this audience over-indexes on their products. One click copies the pitch ready for your email client."
+            text = "Switching to pitch letters, SponsorFit formats personalized cold outreach emails using this sample audit data. Notice the difference: every claim cites verifiable Qloo API response fields, providing transparent data for outreach proposals. One click copies the pitch ready for your email client."
         },
         [PSCustomObject]@{
             id = "shot_07_close"
             name = "Shot 7: Zero-Cost Deployment & Conclusion"
-            text = "SponsorFit is open-source under MIT, tested with 16 automated test suites, and prepped for zero-cost deployment on Vercel Hobby. Built from scratch for the Qloo Agentic Hackathon: because AI agents should have taste. Thank you!"
+            text = "SponsorFit is open-source under MIT, tested with 16 automated tests, and prepped for zero-cost deployment on Vercel Hobby. Built from scratch for the Qloo Agentic Hackathon: because AI agents should have taste. Thank you!"
         }
     )
 }
