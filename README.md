@@ -190,6 +190,38 @@ node scripts/capture-e2e.mjs
 
 ---
 
+## GitLab Transcend: Honesty Guard
+
+Path B entry targeting Best Supervised Agent. The original MIT project is this
+[GitHub repository](https://github.com/RyanDev1st/sponsorfit); the hackathon entry is
+[SponsorFit on GitLab](https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43238005/sponsorfit).
+
+Honesty Guard automates **post-code review and compliance**: it inspects an MR,
+runs the existing tests and claim audit, classifies unsupported claims, and posts
+findings with proposed honest replacements. One human approval gate follows that
+autonomous review. Only approved fixes proceed to the remediation agent; it never
+merges or approves the MR. This is a review aid, not proof that arbitrary cited
+marketing claims are true or a configured GitLab merge-protection rule.
+
+The [custom flow](https://gitlab.com/explore/ai-catalog/flows/1016557) is registered
+and enabled, with Mention, Assign, Assign reviewer and MR-created triggers. Runtime evidence
+and any remaining account steps are tracked in [USER-STEPS](docs/gitlab/USER-STEPS.md).
+
+Judge reproduction:
+
+1. Clone the GitLab project and run `npm ci`, `npm test` and
+   `node --test scripts/guard/honesty-guard.test.mjs`. Local tests use mocks and need no API key.
+2. Open the demo MR linked in [USER-STEPS](docs/gitlab/USER-STEPS.md). Its unsupported
+   adoption statistic is explicitly labelled a deliberate test fixture and stays
+   outside production copy and this README.
+3. Follow USER-STEPS to invoke the enabled flow. Inspect the findings MR comment
+   and session, then review the proposed replacement before approving the outcome.
+4. For the application itself, use the local setup above; a live deployment URL is
+   still required for the final Path B submission.
+
+See [RULES-CHECK](docs/gitlab/RULES-CHECK.md) for the verified deadline, license,
+video requirements and distinction between repository setup and final submission.
+
 ## License
 
 MIT License. Copyright (c) 2026 SponsorFit contributors.
