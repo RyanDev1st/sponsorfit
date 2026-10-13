@@ -25,7 +25,7 @@ export const HACKATHON_BASE_URL = 'https://hackathon.api.qloo.com';
 export class QlooClient {
   constructor(options = {}) {
     this.apiKey = options.apiKey !== undefined ? options.apiKey : (process.env.QLOO_API_KEY || '');
-    this.baseUrl = (options.baseUrl || HACKATHON_BASE_URL).replace(/\/+$/, '');
+    this.baseUrl = (options.baseUrl || process.env.QLOO_API_URL || HACKATHON_BASE_URL).replace(/\/+$/, '');
     this.fetchFn = options.fetchFn || globalThis.fetch;
     this.mockDir = options.mockDir || path.resolve(__dirname, './mocks');
   }
@@ -87,7 +87,19 @@ export class QlooClient {
     }
 
     const data = await res.json();
-    return { ...data, isMock: false };
+    const rawResults = Array.isArray(data.results) ? data.results : [];
+    const normalizedResults = rawResults.map((ent) => ({
+      ...ent,
+      id: ent.id || ent.entity_id,
+      type: ent.type || (Array.isArray(ent.types) ? ent.types[0] : ent.types),
+    }));
+
+    return {
+      success: data.success ?? true,
+      ...data,
+      results: normalizedResults,
+      isMock: false,
+    };
   }
 
   /**
@@ -140,12 +152,73 @@ export class QlooClient {
     });
 
     if (!res.ok) {
+      if (filterType !== 'urn:entity:brand') {
+        // Known limitation: live Qloo returns results.entities for cross-domain instead of results.domains
+        return {
+          success: false,
+          isMock: false,
+          results: {
+            entities: [],
+            domains: {},
+          },
+        };
+      }
       const text = await res.text();
       throw new Error(`Qloo Insights API error (HTTP ${res.status}): ${text}`);
     }
 
     const data = await res.json();
-    return { ...data, isMock: false };
+    const rawEntities = Array.isArray(data.results?.entities) ? data.results.entities : [];
+    const normalizedEntities = rawEntities.map((brand) => {
+      let query = brand.query;
+      if (query) {
+        let explainabilityObj = query.explainability;
+        if (explainabilityObj && typeof explainabilityObj === 'object') {
+          const rawSignals = Array.isArray(explainabilityObj['signal.interests.entities'])
+            ? explainabilityObj['signal.interests.entities']
+            : [];
+          const signals = rawSignals.map((s) => ({
+            ...s,
+            influence: s.influence !== undefined ? s.influence : s.score,
+          }));
+          explainabilityObj = {
+            ...explainabilityObj,
+            signals,
+          };
+        } else if (!explainabilityObj) {
+          explainabilityObj = { signals: [] };
+        }
+        query = {
+          ...query,
+          explainability: explainabilityObj,
+        };
+      }
+
+      const tags = Array.isArray(brand.tags)
+        ? brand.tags.map((t) => (typeof t === 'string' ? t : (t.name || t.id || String(t))))
+        : (brand.tags || []);
+
+      return {
+        ...brand,
+        id: brand.id || brand.entity_id,
+        affinity: query?.affinity ?? brand.affinity ?? 0,
+        tags,
+        query,
+      };
+    });
+
+    const results = {
+      ...data.results,
+      entities: normalizedEntities,
+      // Known limitation: live Qloo returns results.entities for cross-domain instead of results.domains
+      domains: data.results?.domains || {},
+    };
+
+    return {
+      ...data,
+      results,
+      isMock: false,
+    };
   }
 }
 
