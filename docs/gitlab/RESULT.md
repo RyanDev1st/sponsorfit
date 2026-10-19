@@ -3,8 +3,8 @@
 - GitLab project: https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43238005/sponsorfit
 - GitHub origin: https://github.com/RyanDev1st/sponsorfit (preserved).
 - Demo MR: https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43238005/sponsorfit/-/merge_requests/1
-- Fixture commit: `d4551c11c7af61873a7f54cce29de47e0d3e16d5`, on `demo/honesty-guard-unsourced-claim`, mirrored to both hosts. The false adoption claim is clearly labelled and stays on the unmerged demo branch.
-- Setup commit: `ddbbaa290d312896931b3966242ec20282ef6838`, pushed to `main` and `task/g3-gitlab-entry` on GitHub and GitLab; both remote main hashes were independently checked and match. Local edits stay on the separate task branch.
+- Fixture commit: `40bff11ee7b9560a84f0725ab9e91154b95feab5`, on `demo/honesty-guard-unsourced-claim`, mirrored to both hosts. The false adoption claim is clearly labelled and stays on the unmerged demo branch.
+- Setup commit: `90ebcafb8e74f44a8e3c314f7292e02dec6445be`, pushed to `main` and `task/g3-gitlab-entry` on GitHub and GitLab; both remote main hashes were independently checked and match. Local edits stay on the separate task branch.
 - Catalog: https://gitlab.com/explore/ai-catalog/flows/1016557 — enabled, release 1.0.1, consumer 12500616. Custom flow agents are created by the flow, so registering a separate standalone agent is unnecessary.
 - Active Mention/Assign/Assign reviewer trigger: 3014322; MR / Created trigger: 3014324.
 - Real invocation note: https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43238005/sponsorfit/-/merge_requests/1#note_3991401730

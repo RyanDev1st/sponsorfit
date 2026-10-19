@@ -62,7 +62,7 @@ We integrated SponsorFit with the GitLab Duo Agent Platform under Path B (Bring 
 ---
 
 ### Accomplishments That We're Proud Of
-- **Real Paused Duo Session on MR !1:** In a live demonstration on [MR !1](https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43238005/sponsorfit/-/merge_requests/1) (fixture commit `d4551c11c7af61873a7f54cce29de47e0d3e16d5` on branch `demo/honesty-guard-unsourced-claim`), Duo agent session 9292188 caught the ungrounded creator adoption claim in `docs/gitlab/demo-claim.md`, published a structured findings note, proposed an honest nonnumeric alternative, and cleanly halted at **`INPUT_REQUIRED`**.
+- **Real Paused Duo Session on MR !1:** In a live demonstration on [MR !1](https://gitlab.com/gitlab-ai-hackathon/transcend-october-2026/43238005/sponsorfit/-/merge_requests/1) (fixture commit `40bff11ee7b9560a84f0725ab9e91154b95feab5` on branch `demo/honesty-guard-unsourced-claim`), Duo agent session 9292188 caught the ungrounded creator adoption claim in `docs/gitlab/demo-claim.md`, published a structured findings note, proposed an honest nonnumeric alternative, and cleanly halted at **`INPUT_REQUIRED`**.
 - **Human Authority Preserved:** The agent took zero mutating actions without authorization—no files were modified and no merge was forced, proving the viability of supervised agent governance.
 - **Real Defects Surfaced & Resolved:** The workflow surfaced genuine runner glob issues during execution, which were resolved and verified across both GitHub origin and GitLab main branches.
 - **Complete Automated Verification:** 16 core test cases (`npm test`) and full honesty guard unit tests pass cleanly in local environments and CI runners.
