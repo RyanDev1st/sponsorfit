@@ -7,7 +7,7 @@
 
 ## Live Demo
 
-- **URL:** [https://sponsorfit.vercel.app](https://sponsorfit.vercel.app) *(pending deploy — connect GitHub repository to Vercel Hobby)*
+- **URL:** [https://sponsorfit-six.vercel.app](https://sponsorfit-six.vercel.app)
 - **Source Repository:** [https://github.com/RyanDev1st/sponsorfit](https://github.com/RyanDev1st/sponsorfit)
 
 ---

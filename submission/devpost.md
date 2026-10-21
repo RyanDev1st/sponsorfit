@@ -9,7 +9,7 @@
 
 - **Project Title:** SponsorFit
 - **Tagline (â‰¤ 60 chars):** Turn audience cultural taste into brand sponsorships
-- **Live Demo URL:** [https://sponsorfit.vercel.app](https://sponsorfit.vercel.app) *(pending deploy)*
+- **Live Demo URL:** [https://sponsorfit-six.vercel.app](https://sponsorfit-six.vercel.app)
 - **GitHub Repository:** [https://github.com/RyanDev1st/sponsorfit](https://github.com/RyanDev1st/sponsorfit)
 - **License:** MIT License (`Copyright (c) 2026 SponsorFit contributors`)
 
